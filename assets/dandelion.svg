@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 220">
+  <rect width="140" height="220" fill="transparent"/>
+  <g>
+    <path d="M72 200 C73 170, 75 140, 73 102" fill="none" stroke="#6f9e39" stroke-width="7" stroke-linecap="round"/>
+    <path d="M72 200 C56 181, 44 161, 39 132" fill="none" stroke="#6f9e39" stroke-width="6" stroke-linecap="round"/>
+    <path d="M72 200 C89 177, 97 153, 100 122" fill="none" stroke="#6f9e39" stroke-width="6" stroke-linecap="round"/>
+    <path d="M60 162 C41 156, 30 148, 24 133 C42 138, 50 144, 60 162Z" fill="#74b33f"/>
+    <path d="M46 136 C27 131, 16 122, 8 108 C28 113, 38 119, 46 136Z" fill="#7fc84a"/>
+    <path d="M83 151 C104 146, 116 137, 125 123 C105 128, 95 135, 83 151Z" fill="#7cc145"/>
+    <path d="M98 126 C117 123, 128 116, 137 103 C118 107, 108 114, 98 126Z" fill="#74b33f"/>
+    <circle cx="70" cy="84" r="17" fill="#f2d33a"/>
+    <circle cx="40" cy="111" r="15" fill="#f2d33a"/>
+    <g stroke="#f3cf2b" stroke-linecap="round">
+      <g transform="translate(70 84)">
+        <line x1="0" y1="-28" x2="0" y2="-16" stroke-width="4"/>
+        <line x1="0" y1="28" x2="0" y2="16" stroke-width="4"/>
+        <line x1="-28" y1="0" x2="-16" y2="0" stroke-width="4"/>
+        <line x1="28" y1="0" x2="16" y2="0" stroke-width="4"/>
+        <line x1="20" y1="20" x2="10" y2="10" stroke-width="4"/>
+        <line x1="-20" y1="20" x2="-10" y2="10" stroke-width="4"/>
+        <line x1="20" y1="-20" x2="10" y2="-10" stroke-width="4"/>
+        <line x1="-20" y1="-20" x2="-10" y2="-10" stroke-width="4"/>
+        <line x1="12" y1="-25" x2="7" y2="-13" stroke-width="3"/>
+        <line x1="-12" y1="-25" x2="-7" y2="-13" stroke-width="3"/>
+        <line x1="25" y1="12" x2="13" y2="7" stroke-width="3"/>
+        <line x1="-25" y1="12" x2="-13" y2="7" stroke-width="3"/>
+        <line x1="25" y1="-12" x2="13" y2="-7" stroke-width="3"/>
+        <line x1="-25" y1="-12" x2="-13" y2="-7" stroke-width="3"/>
+      </g>
+      <g transform="translate(40 111) scale(.9)">
+        <line x1="0" y1="-28" x2="0" y2="-16" stroke-width="4"/>
+        <line x1="0" y1="28" x2="0" y2="16" stroke-width="4"/>
+        <line x1="-28" y1="0" x2="-16" y2="0" stroke-width="4"/>
+        <line x1="28" y1="0" x2="16" y2="0" stroke-width="4"/>
+        <line x1="20" y1="20" x2="10" y2="10" stroke-width="4"/>
+        <line x1="-20" y1="20" x2="-10" y2="10" stroke-width="4"/>
+        <line x1="20" y1="-20" x2="10" y2="-10" stroke-width="4"/>
+        <line x1="-20" y1="-20" x2="-10" y2="-10" stroke-width="4"/>
+      </g>
+    </g>
+    <circle cx="70" cy="84" r="7" fill="#f8e46c"/>
+    <circle cx="40" cy="111" r="6" fill="#f8e46c"/>
+  </g>
+</svg>
