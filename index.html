@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Venue Minigame Prototype</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <section id="homeScreen" class="screen active home-screen">
+      <div class="home-card">
+        <h1>Venue Minigame Prototype</h1>
+        <p>Pick a venue to test the interaction.</p>
+        <div class="home-buttons">
+          <button id="openWatsons" class="big-button">Mr. Watson's Cafe</button>
+          <button id="openPiston" class="big-button">The Piston Club</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="watsonsScreen" class="screen scene-screen watsons-screen">
+      <button class="back-button" data-back>← Back</button>
+      <div class="scene-header">
+        <h2>Mr. Watson's Cafe</h2>
+        <p>Mr. Watson's bus is in desperate need of a clean. Make it shine again, and I'll give you the part you need.</p>
+      </div>
+      <div class="watsons-scene">
+        <div class="carwash-bg">
+          <div class="wash-rail rail-left"></div>
+          <div class="wash-rail rail-right"></div>
+          <div class="soap-bubbles"></div>
+        </div>
+        <div id="busStage" class="bus-stage">
+          <img id="busImage" src="assets/mr_watsons_bus.svg" alt="Mr Watson's bus" draggable="false" />
+          <canvas id="busDirtCanvas"></canvas>
+        </div>
+      </div>
+      <div class="instruction-bar">Swipe across the bus to wash the dirt away.</div>
+    </section>
+
+    <section id="pistonScreen" class="screen scene-screen piston-screen">
+      <button class="back-button" data-back>← Back</button>
+      <div class="scene-header piston-header">
+        <h2>The Piston Club</h2>
+        <p>I'd love to help and find the part you need, but clear our lawn ready for tomorrow's car meet and I'll give you the engine part you need.</p>
+      </div>
+      <div id="gardenStage" class="garden-stage">
+        <img src="assets/piston_club_garden.png" alt="The Piston Club garden" class="garden-bg" draggable="false" />
+        <div id="weedLayer" class="weed-layer"></div>
+      </div>
+      <div class="instruction-bar">Tap or drag across the weeds to pull them out.</div>
+    </section>
+
+    <div id="rewardModal" class="reward-modal hidden" role="dialog" aria-modal="true">
+      <div class="reward-card">
+        <div class="reward-badge">PART ACQUIRED</div>
+        <h3 id="rewardTitle">BODYWORK</h3>
+        <p id="rewardText">You've earned the part you need.</p>
+        <button id="rewardClose" class="big-button small">Continue</button>
+      </div>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
