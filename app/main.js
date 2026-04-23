@@ -1,0 +1,307 @@
+import {
+  auth,
+  dom,
+  state,
+  browserLocalPersistence,
+  onAuthStateChanged,
+  setPersistence,
+  readScanClaimFromUrl,
+  getPartLabel,
+  resetIdentityState,
+  ROUTE_VENUES,
+  getVenueDistanceMiles,
+  getUserLocation,
+  formatDistanceMiles,
+  getVenueOpenState
+} from "./core.js";
+import {
+  showStatus,
+  clearStatus,
+  renderGarageDirectory,
+  showRecordPanel,
+  hideRecordPanel,
+  closeProfileMenu,
+  toggleProfileMenu,
+  openGarageDirectory,
+  closeGarageDirectory,
+  exitScanClaimMode,
+  hideCelebrationOverlay,
+  updateSecretPanelVisibility,
+  markCard,
+  updateCompletedVehicles
+} from "./ui.js";
+import { startScanner, closeScannerOverlay, stopScanner } from "./scanner.js";
+import { signUpFlow, logInFlow, googleFlow, initAuthUi, setAuthMode } from "./profile.js";
+import { loadUserCard, processVenueFromUrl, runSecretCompletionTest, logOutFlow } from "./records.js";
+import { initHornUi, refreshHornUi, maybeHandleHornRepairClaim } from "./horn.js";
+
+
+async function tryPreferLandscape() {
+  const isCompactScreen = window.matchMedia("(max-width: 900px)").matches;
+  if (!isCompactScreen) return;
+
+  const runningStandalone =
+    window.matchMedia("(display-mode: standalone)").matches ||
+    window.navigator.standalone === true;
+
+  if (!runningStandalone) return;
+  if (!screen.orientation?.lock) return;
+
+  try {
+    await screen.orientation.lock("landscape");
+  } catch {}
+}
+
+function bindEvents() {
+  dom.signUpBtn.addEventListener("click", signUpFlow);
+  dom.logInBtn.addEventListener("click", logInFlow);
+  dom.googleBtn.addEventListener("click", googleFlow);
+  if (dom.showCreateAccountBtn) {
+    dom.showCreateAccountBtn.addEventListener("click", () => {
+      clearStatus();
+      setAuthMode("create");
+    });
+  }
+  if (dom.showLoginBtn) {
+    dom.showLoginBtn.addEventListener("click", () => {
+      clearStatus();
+      setAuthMode("login");
+    });
+  }
+  dom.logOutBtn.addEventListener("click", logOutFlow);
+  dom.secretTestBtn.addEventListener("click", runSecretCompletionTest);
+
+  dom.openScannerBtn.addEventListener("click", startScanner);
+  dom.closeScannerBtn.addEventListener("click", closeScannerOverlay);
+
+  dom.garageDirectoryBtn.addEventListener("click", openGarageDirectory);
+  dom.closeGarageDirectoryBtn.addEventListener("click", closeGarageDirectory);
+
+  dom.profileMenuBtn.addEventListener("click", (event) => {
+    event.stopPropagation();
+    toggleProfileMenu();
+  });
+
+  dom.scannerOverlay.addEventListener("click", async (event) => {
+    if (event.target === dom.scannerOverlay) {
+      await closeScannerOverlay();
+    }
+  });
+
+  dom.garageDirectoryPanel.addEventListener("click", (event) => {
+    if (event.target === dom.garageDirectoryPanel) {
+      closeGarageDirectory();
+    }
+  });
+
+  document.addEventListener("click", (event) => {
+    if (dom.accountActionsPanel && !dom.accountActionsPanel.contains(event.target)) {
+      closeProfileMenu();
+    }
+
+    const partButton = event.target.closest("[data-venue-link]");
+    if (partButton) {
+      const partKey = partButton.getAttribute("data-venue-link");
+      window.location.href = `./venue.html?garage=${encodeURIComponent(partKey)}`;
+    }
+  });
+
+  document.addEventListener("keydown", async (event) => {
+    if (event.key === "Escape") {
+      closeProfileMenu();
+      closeGarageDirectory();
+      if (dom.scannerOverlay.classList.contains("show")) {
+        await closeScannerOverlay();
+      }
+    }
+  });
+
+  window.addEventListener("beforeunload", () => {
+    stopScanner();
+  });
+
+  document.addEventListener("dblclick", (event) => {
+    event.preventDefault();
+  }, { passive: false });
+
+  window.addEventListener("orientationchange", () => {
+    window.setTimeout(() => {
+      tryPreferLandscape();
+      window.scrollTo(0, 0);
+      document.activeElement?.blur?.();
+    }, 120);
+  });
+}
+
+
+
+function getTileDistancePresentation(miles) {
+  if (!Number.isFinite(miles)) {
+    return { text: "Distance unavailable", isNear: false, isVeryNear: false };
+  }
+
+  if (miles < 1) {
+    return { text: "You're almost here!", isNear: true, isVeryNear: true };
+  }
+
+  if (miles < 2) {
+    return { text: "You're almost here, just around the corner.", isNear: true, isVeryNear: true };
+  }
+
+  const rounded = miles < 10 ? miles.toFixed(1) : String(Math.round(miles));
+  return {
+    text: `You're only ${rounded} miles away`,
+    isNear: miles < 5,
+    isVeryNear: false
+  };
+}
+
+async function updateDashboardDistances() {
+  const tileTargets = ROUTE_VENUES.map((venue) => ({
+    venue,
+    el: document.getElementById(`distance-${venue.partKey}`)
+  })).filter((entry) => entry.el);
+
+  const directoryTargets = ROUTE_VENUES.map((venue) => ({
+    venue,
+    el: document.getElementById(`directory-distance-${venue.partKey}`),
+    openEl: document.getElementById(`directory-open-${venue.partKey}`)
+  }));
+
+  tileTargets.forEach(({ el }) => {
+    el.textContent = "Locating…";
+    el.classList.remove("is-near", "is-very-near");
+  });
+
+  directoryTargets.forEach(({ openEl, el, venue }) => {
+    if (openEl) {
+      const openState = getVenueOpenState(venue);
+      openEl.textContent = openState.label;
+      openEl.className = `directory-open-label ${openState.isOpen ? "is-open" : "is-closed"}`;
+    }
+    if (el) {
+      el.textContent = "Locating…";
+    }
+  });
+
+  try {
+    const userCoords = await getUserLocation();
+    tileTargets.forEach(({ venue, el }) => {
+      const miles = getVenueDistanceMiles(venue, userCoords);
+      const presentation = getTileDistancePresentation(miles);
+      el.textContent = presentation.text;
+      el.classList.toggle("is-near", presentation.isNear);
+      el.classList.toggle("is-very-near", presentation.isVeryNear);
+    });
+    directoryTargets.forEach(({ venue, el }) => {
+      if (!el) return;
+      const miles = getVenueDistanceMiles(venue, userCoords);
+      el.textContent = Number.isFinite(miles) ? formatDistanceMiles(miles) : "Distance unavailable";
+    });
+  } catch {
+    tileTargets.forEach(({ el }) => {
+      el.textContent = "Location off";
+      el.classList.remove("is-near", "is-very-near");
+    });
+    directoryTargets.forEach(({ el }) => {
+      if (el) el.textContent = "Location off";
+    });
+  }
+}
+
+function resetSignedOutState() {
+  state.currentVisitedVenues = [];
+  state.currentCompletedVehicles = 0;
+  resetIdentityState();
+  state.completionInProgress = false;
+
+  markCard([]);
+  updateCompletedVehicles(0);
+  hideRecordPanel();
+  updateSecretPanelVisibility();
+}
+
+async function handleAuthStateChanged(user) {
+  const claim = readScanClaimFromUrl();
+  state.completionInProgress = false;
+  hideCelebrationOverlay();
+
+  if (user) {
+    document.body.classList.add("signed-in");
+    document.body.classList.add("rotate-lock");
+    dom.brandPanel.classList.add("hidden");
+    dom.authPanel.classList.add("hidden");
+    dom.accountActionsPanel.classList.remove("hidden");
+    closeProfileMenu();
+    showRecordPanel();
+    updateSecretPanelVisibility();
+    exitScanClaimMode();
+    clearStatus();
+
+    await loadUserCard(user);
+    refreshHornUi();
+    maybeHandleHornRepairClaim();
+    updateDashboardDistances();
+
+    if (claim.state === "valid") {
+      await processVenueFromUrl(user);
+      return;
+    }
+
+    if (claim.state === "invalid") {
+      showStatus("This QR code is invalid or incomplete.", "error");
+    }
+
+    document.body.classList.remove("auth-loading");
+    return;
+  }
+
+  document.body.classList.remove("signed-in");
+  document.body.classList.remove("rotate-lock");
+  dom.brandPanel.classList.remove("hidden");
+  dom.authPanel.classList.remove("hidden");
+  dom.accountActionsPanel.classList.add("hidden");
+  closeProfileMenu();
+  closeGarageDirectory();
+  exitScanClaimMode();
+
+  resetSignedOutState();
+  refreshHornUi();
+  initAuthUi();
+
+  document.body.classList.remove("auth-loading");
+
+  if (claim.state === "valid" && claim.partKey) {
+    showStatus(`Log in to claim your ${getPartLabel(claim.partKey)} stamp.`, "info");
+  } else if (claim.state === "invalid") {
+    showStatus("This QR code is invalid or incomplete.", "error");
+  } else {
+    clearStatus();
+  }
+}
+
+
+function prefetchVenuePages() {
+  ROUTE_VENUES.forEach((venue) => {
+    const link = document.createElement("link");
+    link.rel = "prefetch";
+    link.href = `./venue.html?garage=${encodeURIComponent(venue.partKey)}`;
+    document.head.appendChild(link);
+  });
+}
+
+async function initApp() {
+  await tryPreferLandscape();
+  renderGarageDirectory();
+  prefetchVenuePages();
+  closeProfileMenu();
+  initAuthUi();
+  bindEvents();
+  initHornUi();
+  await setPersistence(auth, browserLocalPersistence);
+  onAuthStateChanged(auth, handleAuthStateChanged);
+}
+
+initApp().catch((error) => {
+  showStatus(error.message || "App failed to initialise.", "error");
+});
