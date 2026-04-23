@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pick the Weeds</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <section id="menuScreen" class="screen screen--active">
+      <div class="menu-card">
+        <p class="eyebrow">Mini-game</p>
+        <h1>Pick the Weeds</h1>
+        <p class="menu-copy">The Piston Club lawn needs tidying before tomorrow’s car meet. Pull every dandelion out and they’ll hand over the engine part you need.</p>
+        <button id="startBtn" class="primary-btn">Start Clearing</button>
+      </div>
+    </section>
+
+    <section id="gameScreen" class="screen" aria-hidden="true">
+      <button id="backBtn" class="back-btn" aria-label="Back to menu">← Menu</button>
+      <div class="hud">
+        <div class="hud-pill">Weeds left: <span id="remainingCount">10</span></div>
+      </div>
+
+      <div id="gardenStage" class="garden-stage">
+        <img class="garden-bg" src="assets/Pistongarden.jpg" alt="The Piston Club garden" />
+        <div id="weedLayer" class="weed-layer"></div>
+      </div>
+
+      <div class="instruction-panel">
+        <h2>The Piston Club</h2>
+        <p>I’d love to help and find the part you need, but our lawn has to look right before tomorrow’s meet. Pull every weed out and I’ll give you the engine part.</p>
+        <p class="hint">Press, drag, and pull each weed out of the ground.</p>
+      </div>
+    </section>
+
+    <div id="successModal" class="modal" aria-hidden="true">
+      <div class="modal-card">
+        <p class="modal-kicker">Reward unlocked</p>
+        <h2>ENGINE PART ACQUIRED</h2>
+        <p>The lawn is clear and ready for the next meet.</p>
+        <button id="returnToMenuBtn" class="primary-btn">Back to Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

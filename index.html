@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mini Game Library</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: Arial, sans-serif; background:#09111a; color:#f2f7ff; }
+    .layout { display:grid; grid-template-columns: 320px 1fr; min-height:100vh; }
+    .sidebar { padding:20px; border-right:1px solid rgba(255,255,255,.1); background:#0d1823; overflow:auto; }
+    .sidebar h1 { margin:0 0 10px; font-size:28px; }
+    .sidebar p { color:rgba(255,255,255,.75); line-height:1.45; }
+    .list { display:grid; gap:10px; margin-top:18px; }
+    .game-btn {
+      width:100%; text-align:left; padding:14px 16px; border-radius:14px; border:1px solid rgba(255,255,255,.12);
+      background:#162330; color:#fff; cursor:pointer; font-size:15px; font-weight:700;
+    }
+    .game-btn small { display:block; font-weight:400; opacity:.74; margin-top:4px; }
+    .viewer { position:relative; background:#000; min-height:100vh; }
+    iframe { position:absolute; inset:0; width:100%; height:100%; border:0; background:#000; }
+    .empty {
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center; padding:30px;
+      color:rgba(255,255,255,.8);
+    }
+    .result {
+      margin-top:14px; padding:12px 14px; border-radius:12px; background:rgba(255,255,255,.06); color:#cde6ff;
+      min-height:46px;
+    }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; grid-template-rows:auto 70vh; }
+      .sidebar { border-right:0; border-bottom:1px solid rgba(255,255,255,.1); }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <h1>Mini Game Library</h1>
+      <p>Each game lives in its own folder and can be dropped into a bigger app. This launcher is just for testing the packages quickly.</p>
+      <div class="list" id="list"></div>
+      <div class="result" id="result">Choose a game to load it.</div>
+    </aside>
+    <main class="viewer">
+      <div class="empty" id="empty">Pick a mini-game from the list to launch it here.</div>
+      <iframe id="frame" hidden></iframe>
+    </main>
+  </div>
+
+  <script>
+    const games = [{"slug": "clean-the-bus-game", "title": "Clean the Bus", "desc": "Wash Mr. Watson’s bus until it is 95% clean."}, {"slug": "pick-the-weeds-game", "title": "Pick the Weeds", "desc": "Press, drag, and pull 10 weeds from The Piston Club lawn."}, {"slug": "traffic-swerve", "title": "Traffic Swerve", "desc": "Switch lanes and avoid traffic for 30 seconds."}, {"slug": "cross-the-road", "title": "Cross the Road", "desc": "Make three clean crossings through moving traffic."}, {"slug": "reaction-rush", "title": "Reaction Rush", "desc": "Hit good targets, avoid bad ones, and clear the score before time runs out."}, {"slug": "safe-crack", "title": "Safe Crack", "desc": "Time three lock-ins on the moving dial."}, {"slug": "runner-lite", "title": "Runner Lite", "desc": "Jump the obstacles and survive to the finish."}, {"slug": "balance-beam", "title": "Balance Beam", "desc": "Keep the wobble in the safe zone until the timer ends."}, {"slug": "memory-path", "title": "Memory Path", "desc": "Watch the route, then repeat it correctly."}, {"slug": "catch-sort", "title": "Catch Sort", "desc": "Catch the good drops and avoid the bad ones."}, {"slug": "barrel-dodge", "title": "Barrel Dodge", "desc": "Weave through bouncing barrels until the wave ends."}, {"slug": "slingshot-shot", "title": "Slingshot Shot", "desc": "Drag, aim, and fire to hit three targets."}];
+    const list = document.getElementById('list');
+    const frame = document.getElementById('frame');
+    const empty = document.getElementById('empty');
+    const result = document.getElementById('result');
+
+    for (const game of games) {
+      const button = document.createElement('button');
+      button.className = 'game-btn';
+      button.innerHTML = `${game.title}<small>${game.desc}</small>`;
+      button.addEventListener('click', () => {
+        frame.hidden = false;
+        empty.hidden = true;
+        frame.src = `./${game.slug}/index.html`;
+        result.textContent = `Loaded: ${game.title}`;
+      });
+      list.appendChild(button);
+    }
+
+    window.addEventListener('message', (event) => {
+      const data = event.data;
+      if (!data || !data.source) return;
+      if (data.type === 'exit') {
+        frame.hidden = true;
+        frame.src = 'about:blank';
+        empty.hidden = false;
+        result.textContent = data.reason === 'win'
+          ? `${data.source}: player finished and returned to the menu.`
+          : `${data.source}: player quit and returned to the menu.`;
+      } else if (data.type === 'won') {
+        result.textContent = `${data.source}: mini-game complete.`;
+      } else if (data.type === 'failed') {
+        result.textContent = `${data.source}: failed and is resetting.`;
+      }
+    });
+  </script>
+</body>
+</html>

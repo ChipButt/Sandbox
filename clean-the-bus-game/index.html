@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clean the Bus</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <section id="menuScreen" class="screen screen--active">
+      <div class="menu-card">
+        <p class="eyebrow">Mini-game</p>
+        <h1>Clean the Bus</h1>
+        <p class="menu-copy">Mr. Watson’s bus is in desperate need of a clean. Make it shine again and he’ll hand over the bodywork part you need.</p>
+        <button id="startBtn" class="primary-btn">Start Cleaning</button>
+      </div>
+    </section>
+
+    <section id="gameScreen" class="screen" aria-hidden="true">
+      <button id="backBtn" class="back-btn" aria-label="Back to menu">← Menu</button>
+      <div class="hud">
+        <div class="hud-pill">Target: 95% clean</div>
+        <div id="progressText" class="hud-pill">Cleaned 0%</div>
+      </div>
+
+      <div class="wash-bay">
+        <div id="busStage" class="bus-stage">
+          <img id="busImage" src="assets/Mr Watsons Bus.jpeg" alt="Mr Watsons bus" />
+          <canvas id="mudCanvas"></canvas>
+        </div>
+      </div>
+
+      <div class="instruction-panel">
+        <h2>Mr. Watson’s Cafe</h2>
+        <p>Mr. Watson’s bus is in desperate need of a clean. Make it shine again and I’ll give you the part you need.</p>
+        <p class="hint">Swipe across the bus to wash the dirt off.</p>
+      </div>
+    </section>
+
+    <div id="successModal" class="modal" aria-hidden="true">
+      <div class="modal-card">
+        <p class="modal-kicker">Reward unlocked</p>
+        <h2>BODYWORK PART ACQUIRED</h2>
+        <p>The bus is shining again. Mr. Watson hands over the part.</p>
+        <button id="returnToMenuBtn" class="primary-btn">Back to Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
