@@ -1,0 +1,150 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function validRuneIds() {
+      return [
+        'roll-britannia',
+        'stand-1',
+        'stand-2',
+        'stand-3',
+        'stand-4',
+        'stand-5'
+      ];
+    }
+
+    function validClaimTier(data) {
+      return data.claimTier == null
+        || data.claimTier in ['legendary', 'godlike'];
+    }
+
+    function validClaimState(data) {
+      return (
+          data.claimed == false
+          && data.claimTier == null
+        ) || (
+          data.claimed == true
+          && data.claimTier == 'legendary'
+          && data.level >= 5
+        ) || (
+          data.claimed == true
+          && data.claimTier == 'godlike'
+          && data.level == 6
+        );
+    }
+
+    function validPlayerData(uid) {
+      let data = request.resource.data;
+      return isOwner(uid)
+        && data.keys().hasOnly([
+          'authUid',
+          'localPlayerId',
+          'appVersion',
+          'level',
+          'scannedRuneIds',
+          'claimed',
+          'claimTier',
+          'claimedAt',
+          'pendingGodlikeConsent',
+          'prizeDrawSubmitted',
+          'createdAt',
+          'updatedAt',
+          'lastClientSyncAttemptAt',
+          'updatedServerAt'
+        ])
+        && data.authUid == uid
+        && data.localPlayerId is string
+        && data.appVersion is string
+        && data.level is int
+        && data.level >= 0
+        && data.level <= 6
+        && data.scannedRuneIds is list
+        && data.scannedRuneIds.size() == data.level
+        && data.scannedRuneIds.size() <= 6
+        && data.scannedRuneIds.hasOnly(validRuneIds())
+        && data.claimed is bool
+        && validClaimTier(data)
+        && validClaimState(data)
+        && data.pendingGodlikeConsent is bool
+        && data.prizeDrawSubmitted is bool
+        && (data.claimedAt == null || data.claimedAt is string)
+        && data.createdAt is string
+        && data.updatedAt is string
+        && data.lastClientSyncAttemptAt is string;
+    }
+
+    function validPlayerProgression() {
+      let oldData = resource.data;
+      let newData = request.resource.data;
+      return newData.authUid == oldData.authUid
+        && newData.localPlayerId == oldData.localPlayerId
+        && newData.level >= oldData.level
+        && newData.scannedRuneIds.hasAll(oldData.scannedRuneIds)
+        && (oldData.claimed == false || newData.claimed == true);
+    }
+
+    function validPrizeDrawData(uid) {
+      let data = request.resource.data;
+      return isOwner(uid)
+        && data.keys().hasOnly([
+          'authUid',
+          'localPlayerId',
+          'appVersion',
+          'claimTier',
+          'swordLevel',
+          'scannedRuneIds',
+          'name',
+          'email',
+          'phone',
+          'consent',
+          'consentText',
+          'submittedAt',
+          'updatedServerAt'
+        ])
+        && data.authUid == uid
+        && data.localPlayerId is string
+        && data.appVersion is string
+        && data.claimTier == 'godlike'
+        && data.swordLevel == 6
+        && data.scannedRuneIds is list
+        && data.scannedRuneIds.size() == 6
+        && data.scannedRuneIds.hasOnly(validRuneIds())
+        && data.name is string
+        && data.name.size() > 0
+        && data.name.size() <= 120
+        && data.email is string
+        && data.email.size() > 3
+        && data.email.size() <= 180
+        && data.phone is string
+        && data.phone.size() <= 40
+        && data.consent == true
+        && data.consentText is string
+        && data.submittedAt is string;
+    }
+
+    match /forgeQuestPlayers/{uid} {
+      allow create: if validPlayerData(uid);
+      allow read: if isOwner(uid);
+      allow update: if validPlayerData(uid) && validPlayerProgression();
+      allow delete: if false;
+    }
+
+    match /forgeQuestPrizeDraw/{uid} {
+      allow create, update: if validPrizeDrawData(uid);
+      allow read: if isOwner(uid);
+      allow delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
