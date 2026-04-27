@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#120817" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Forge Quest" />
+
+  <title>Roll Britannia Forge Quest</title>
+
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <section class="hero-panel">
+      <div class="brand-pill">Roll Britannia Live Quest</div>
+      <h1>Forge Quest</h1>
+      <p>
+        Scan quest sigils around the event to forge your blade from humble steel into something worthy of legend.
+      </p>
+    </section>
+
+    <section class="status-row" aria-live="polite">
+      <div id="connectionStatus" class="status-chip">Checking connection…</div>
+      <div id="syncStatus" class="status-chip">Checking save…</div>
+    </section>
+
+    <section class="sword-card" id="swordCard">
+      <div class="rarity-pill" id="rarityPill">No Sword</div>
+      <h2 id="swordName">No Sword Forged Yet</h2>
+      <p id="swordDescription">Scan any quest stand QR code to begin.</p>
+
+      <div class="sword-frame" id="swordFrame" aria-live="polite">
+        <div id="swordArt" class="sword-art"></div>
+      </div>
+
+      <div id="messageBox" class="message-box hidden"></div>
+
+      <div class="progress-wrap">
+        <div class="progress-labels">
+          <span id="progressText">Progress: 0 / 6</span>
+          <span id="nextText">Next: Common Iron Sword</span>
+        </div>
+        <div class="progress-track" aria-hidden="true">
+          <div id="progressFill" class="progress-fill"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-grid">
+      <article class="panel">
+        <h2>Quest Stands</h2>
+        <p>
+          Scan each stand once. Any stand can be your first scan, and each unique stand upgrades your sword by one level.
+        </p>
+        <div id="standList" class="stand-list"></div>
+      </article>
+
+      <article class="panel">
+        <h2>Reward Exchange</h2>
+        <p>
+          Rewards are claimed by scanning a staff-held claim QR code. Legendary gives an immediate gift. Godlike gives an immediate gift and prize draw entry.
+        </p>
+        <div id="rewardList" class="reward-list"></div>
+      </article>
+    </section>
+
+    <section id="claimPanel" class="claim-panel hidden" aria-live="polite">
+      <h2 id="claimTitle">Reward Claim</h2>
+      <p id="claimText"></p>
+
+      <form id="prizeDrawForm" class="prize-form hidden">
+        <label>
+          Name
+          <input id="drawName" name="drawName" type="text" autocomplete="name" required />
+        </label>
+
+        <label>
+          Email address
+          <input id="drawEmail" name="drawEmail" type="email" autocomplete="email" required />
+        </label>
+
+        <label>
+          Phone number <span class="optional">optional</span>
+          <input id="drawPhone" name="drawPhone" type="tel" autocomplete="tel" />
+        </label>
+
+        <label class="checkbox-row">
+          <input id="drawConsent" name="drawConsent" type="checkbox" required />
+          <span>I agree to be contacted by Roll Britannia if I win the prize draw.</span>
+        </label>
+
+        <button class="primary-btn" type="submit">Enter Prize Draw</button>
+      </form>
+    </section>
+
+    <details class="qr-panel">
+      <summary>QR setup links</summary>
+      <p>
+        Use these URLs to create your QR codes. The app will replace the start of each URL with your live GitHub Pages address automatically when viewed online.
+      </p>
+      <div id="qrLinks" class="qr-links"></div>
+    </details>
+
+    <section class="admin-tools">
+      <button id="syncNowBtn" class="secondary-btn" type="button">Sync Now</button>
+      <button id="resetBtn" class="danger-btn" type="button">Reset This Device</button>
+    </section>
+  </main>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

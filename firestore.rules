@@ -1,0 +1,74 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function validStandIds() {
+      return [
+        'roll-britannia',
+        'stand-1',
+        'stand-2',
+        'stand-3',
+        'stand-4',
+        'stand-5'
+      ];
+    }
+
+    function validPlayerWrite() {
+      return signedIn()
+        && request.resource.data.authUid == request.auth.uid
+        && request.resource.data.playerId is string
+        && request.resource.data.scannedStandIds is list
+        && request.resource.data.scannedStandIds.size() >= 0
+        && request.resource.data.scannedStandIds.size() <= 6
+        && request.resource.data.scannedStandIds.hasOnly(validStandIds())
+        && request.resource.data.level is int
+        && request.resource.data.level == request.resource.data.scannedStandIds.size()
+        && request.resource.data.level >= 0
+        && request.resource.data.level <= 6
+        && request.resource.data.claimed is bool
+        && (request.resource.data.claimTier == null || request.resource.data.claimTier in ['legendary', 'godlike'])
+        && request.resource.data.pendingGodlikeClaim is bool;
+    }
+
+    match /forgeQuestPlayers/{playerId} {
+      allow create: if validPlayerWrite()
+        && request.resource.data.playerId == playerId;
+
+      allow read: if signedIn()
+        && resource.data.authUid == request.auth.uid;
+
+      allow update: if validPlayerWrite()
+        && resource.data.authUid == request.auth.uid
+        && request.resource.data.playerId == playerId
+        && request.resource.data.authUid == resource.data.authUid
+        && request.resource.data.level >= resource.data.level;
+
+      allow delete: if false;
+    }
+
+    match /forgeQuestPrizeDraw/{playerId} {
+      allow create, update: if signedIn()
+        && request.resource.data.authUid == request.auth.uid
+        && request.resource.data.playerId == playerId
+        && request.resource.data.claimTier == 'godlike'
+        && request.resource.data.swordLevel == 6
+        && request.resource.data.name is string
+        && request.resource.data.email is string
+        && request.resource.data.phone is string
+        && request.resource.data.consent == true;
+
+      allow read: if signedIn()
+        && resource.data.authUid == request.auth.uid;
+
+      allow delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
