@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#120817" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Forge Quest" />
+
+  <title>Roll Britannia Forge Quest</title>
+
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <header class="hero-panel">
+      <div class="brand-pill">Roll Britannia Live Quest</div>
+      <h1>Forge Quest</h1>
+      <p>
+        Seek out known rune holders around the event. Place each rune within the absorption window to empower your weapon.
+      </p>
+    </header>
+
+    <section class="status-row" aria-live="polite">
+      <div id="connectionStatus" class="status-chip">Checking connection…</div>
+      <div id="syncStatus" class="status-chip">Checking save…</div>
+    </section>
+
+    <section id="installHint" class="install-hint hidden" aria-live="polite">
+      <div>
+        <strong>Keep your sword safe.</strong>
+        <p>Add this quest to your phone Home Screen and use the same phone and browser throughout the event. It will keep working better if the signal drops.</p>
+      </div>
+      <button id="dismissInstallHintBtn" class="secondary-btn" type="button">Got it</button>
+    </section>
+
+    <section class="sword-card" id="swordCard">
+      <div class="rarity-pill" id="rarityPill">No Sword</div>
+      <h2 id="swordName">No Sword Forged Yet</h2>
+      <p id="swordDescription">Open the rune absorption window and scan any quest rune to begin.</p>
+
+      <div class="sword-frame" id="swordFrame" aria-live="polite">
+        <div id="swordArt" class="sword-art"></div>
+      </div>
+
+      <div id="messageBox" class="message-box hidden"></div>
+
+      <div id="rewardHint" class="reward-hint hidden"></div>
+
+      <div class="progress-wrap">
+        <div class="progress-labels">
+          <span id="progressText">Progress: 0 / 6</span>
+          <span id="nextText">Next: Common Iron Sword</span>
+        </div>
+        <div class="progress-track" aria-hidden="true">
+          <div id="progressFill" class="progress-fill"></div>
+        </div>
+      </div>
+
+      <button id="openScannerBtn" class="primary-btn scan-btn" type="button">
+        Open Rune Absorption Window
+      </button>
+    </section>
+
+    <section class="content-grid single-focus">
+      <article class="panel">
+        <h2>Known Rune Locations</h2>
+        <p>
+          Each rune can only empower your weapon once. Scan different locations to unlock stronger forms.
+        </p>
+        <div id="locationList" class="location-list"></div>
+      </article>
+    </section>
+
+    <section id="claimPanel" class="claim-panel hidden" aria-live="polite">
+      <h2 id="claimTitle">Reward Claim</h2>
+      <p id="claimText"></p>
+
+      <form id="prizeDrawForm" class="prize-form hidden">
+        <label>
+          Name
+          <input id="drawName" name="drawName" type="text" autocomplete="name" required />
+        </label>
+
+        <label>
+          Email address
+          <input id="drawEmail" name="drawEmail" type="email" autocomplete="email" required />
+        </label>
+
+        <label>
+          Phone number <span class="optional">optional</span>
+          <input id="drawPhone" name="drawPhone" type="tel" autocomplete="tel" />
+        </label>
+
+        <label class="checkbox-row">
+          <input id="drawConsent" name="drawConsent" type="checkbox" required />
+          <span>I agree to be contacted by Roll Britannia if I win the prize draw.</span>
+        </label>
+
+        <button class="primary-btn" type="submit">Enter Prize Draw</button>
+      </form>
+    </section>
+
+    <section id="devPanel" class="dev-panel hidden">
+      <h2>Testing Controls</h2>
+      <p>This test build shows these controls inside the app so you can test the full quest without printing or scanning QR codes.</p>
+      <div class="test-actions">
+        <button id="testNextRuneBtn" class="primary-btn" type="button">Fake Scan: Absorb Next Unused Rune</button>
+        <button id="testLegendaryClaimBtn" class="secondary-btn" type="button">Fake Scan: Legendary Claim Rune</button>
+        <button id="testGodlikeClaimBtn" class="secondary-btn" type="button">Fake Scan: Godlike Claim Rune</button>
+      </div>
+      <div id="qrLinks" class="qr-links"></div>
+      <button id="resetBtn" class="danger-btn" type="button">Reset This Browser Save</button>
+    </section>
+  </main>
+
+  <div id="scannerOverlay" class="scanner-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="scannerTitle">
+    <div class="scanner-card">
+      <div class="scanner-topline">
+        <div>
+          <span class="scanner-kicker">Rune Absorption</span>
+          <h2 id="scannerTitle">The Aether Lens</h2>
+        </div>
+        <button id="closeScannerBtn" class="icon-btn" type="button" aria-label="Close scanner">×</button>
+      </div>
+
+      <p class="scanner-copy">
+        Hold the rune sigil inside the window. When the lens recognises its power, your weapon will absorb the upgrade automatically.
+      </p>
+
+      <div class="video-shell">
+        <video id="scannerVideo" class="scanner-video" autoplay muted playsinline></video>
+        <div id="html5Reader" class="html5-reader hidden"></div>
+        <div class="reticle" aria-hidden="true">
+          <span></span><span></span><span></span><span></span>
+        </div>
+        <div class="scan-line" aria-hidden="true"></div>
+      </div>
+
+      <div id="scannerStatus" class="scanner-status">Preparing the Aether Lens…</div>
+
+      <details id="manualFallback" class="manual-fallback hidden">
+        <summary>Rune not scanning?</summary>
+        <p>Use this fallback only if the device camera cannot read the QR code.</p>
+        <form id="manualRuneForm" class="manual-form">
+          <input id="manualRuneInput" type="text" placeholder="Enter rune code" autocomplete="off" autocapitalize="off" spellcheck="false" />
+          <button class="secondary-btn" type="submit">Absorb Rune</button>
+        </form>
+      </details>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
