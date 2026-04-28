@@ -1,0 +1,13 @@
+{
+  "name": "Reusable Basic Island",
+  "tileSize": 48,
+  "width": 64,
+  "height": 44,
+  "spawn": { "x": 31, "y": 25 },
+  "questHooks": [
+    { "id": "cave_start", "tile": { "x": 46, "y": 15 }, "label": "Cave entrance / dungeon hook" },
+    { "id": "dock_arrival", "tile": { "x": 5, "y": 25 }, "label": "Arrival dock / boat hook" },
+    { "id": "cliff_lookout", "tile": { "x": 45, "y": 11 }, "label": "Lookout / NPC hook" },
+    { "id": "village_clearing", "tile": { "x": 31, "y": 24 }, "label": "Main quest hub clearing" }
+  ]
+}

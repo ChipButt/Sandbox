@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>A Place in the Sun - Reusable Island Template</title>
+  <link rel="stylesheet" href="src/styles.css" />
+</head>
+<body>
+  <main id="gameShell">
+    <section id="screenWrap">
+      <canvas id="game" width="960" height="624"></canvas>
+      <div id="hud">
+        <div><strong>A Place in the Sun</strong><span>Reusable Island Template</span></div>
+        <div class="controls">Move: WASD / Arrow Keys · Interact: E / Enter</div>
+      </div>
+      <div id="prompt"></div>
+    </section>
+    <aside id="panel">
+      <h1>Basic Island Build</h1>
+      <p>This is a playable drop-in island folder built from the supplied beach terrain pack.</p>
+      <ul>
+        <li>48px tile grid</li>
+        <li>Camera-follow player</li>
+        <li>Animated water/tall grass/palms</li>
+        <li>Collision map</li>
+        <li>Dock, beach, cliffs, cave, rocks, paths</li>
+        <li>Quest hooks in <code>maps/island.map.json</code></li>
+      </ul>
+    </aside>
+  </main>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
