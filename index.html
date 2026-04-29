@@ -1,1 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Place On The Sun - Tactical Battle Engine Demo</title>
+  <link rel="stylesheet" href="./battle-engine/battle.css" />
+</head>
+<body>
+  <main class="demo-shell">
+    <header class="demo-header">
+      <p class="demo-kicker">The Place On The Sun</p>
+      <h1>Drop-in Tactical Battle Engine</h1>
+      <p>
+        Fixed 48px tiles, variable-size arenas, scrolling 8x5 camera, initiative order,
+        movement, attacks, guard, dash, skills, and simple enemy AI.
+      </p>
+    </header>
 
+    <section class="demo-controls" aria-label="Demo controls">
+      <button id="startForestBattle" type="button">Start Forest Road Battle</button>
+      <button id="startSmallBattle" type="button">Start Small Tavern Battle</button>
+      <button id="resetBattle" type="button">Reset Current Battle</button>
+    </section>
+
+    <section id="battleRoot" class="battle-root" aria-label="Battle screen"></section>
+  </main>
+
+  <script type="module">
+    import { BattleEngine } from './battle-engine/BattleEngine.js';
+    import { createForestRoadEncounter, createSmallTavernEncounter } from './battle-engine/battleData.js';
+
+    const root = document.getElementById('battleRoot');
+    const forestButton = document.getElementById('startForestBattle');
+    const smallButton = document.getElementById('startSmallBattle');
+    const resetButton = document.getElementById('resetBattle');
+
+    let currentBattle = null;
+    let currentEncounterFactory = createForestRoadEncounter;
+
+    function startBattle(factory) {
+      currentEncounterFactory = factory;
+      if (currentBattle) currentBattle.destroy();
+
+      currentBattle = new BattleEngine({
+        root,
+        encounter: factory(),
+        onBattleEnd: (result) => {
+          console.log('Battle ended:', result);
+        }
+      });
+
+      currentBattle.start();
+    }
+
+    forestButton.addEventListener('click', () => startBattle(createForestRoadEncounter));
+    smallButton.addEventListener('click', () => startBattle(createSmallTavernEncounter));
+    resetButton.addEventListener('click', () => startBattle(currentEncounterFactory));
+
+    startBattle(createForestRoadEncounter);
+  </script>
+</body>
+</html>
