@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>48px Character Pack Builder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="./styles.css" rel="stylesheet" />
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Reference art → NESW pixel character → code pack</p>
+        <h1>48px Character Pack Builder</h1>
+        <p class="lede">
+          Upload a photo or character artwork, generate static north/east/south/west pixel views,
+          tweak the look, then export a drop-in character code pack.
+        </p>
+      </div>
+      <div class="status-card">
+        <span class="status-dot" id="statusDot"></span>
+        <div>
+          <strong id="modeText">Checking mode…</strong>
+          <p id="modeHelp">The app works in mock mode until an API key is added.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <form id="characterForm" class="panel">
+        <h2>Character setup</h2>
+
+        <label>
+          Reference image
+          <input type="file" id="reference" name="reference" accept="image/png,image/jpeg,image/webp" />
+        </label>
+
+        <div class="two">
+          <label>
+            Name
+            <input name="name" placeholder="Keth Frostiron" value="Keth Frostiron" required />
+          </label>
+
+          <label>
+            Role
+            <select name="role">
+              <option value="npc">NPC</option>
+              <option value="shopkeeper">Shopkeeper</option>
+              <option value="quest-giver">Quest giver</option>
+              <option value="enemy">Enemy</option>
+              <option value="follower">Follower</option>
+              <option value="resource-buyer">Resource buyer</option>
+              <option value="playable">Playable character</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="two">
+          <label>
+            Width
+            <input name="width" type="number" min="16" max="256" value="48" />
+          </label>
+
+          <label>
+            Height
+            <input name="height" type="number" min="16" max="256" value="48" />
+          </label>
+        </div>
+
+        <label>
+          Visual notes
+          <textarea name="artNotes" rows="4" placeholder="Broad shoulders, wild brown hair, full beard, leather apron, chunky boots."></textarea>
+        </label>
+
+        <label>
+          Tweak notes
+          <textarea name="tweakNotes" rows="3" placeholder="Use this after the first generation, e.g. make the head wider, lighten the beard, remove weapon."></textarea>
+        </label>
+
+        <h2>NPC behaviour</h2>
+
+        <div class="two">
+          <label>
+            Behaviour
+            <select name="behaviour">
+              <option value="stationary">Stationary</option>
+              <option value="wander">Wander</option>
+              <option value="patrol">Patrol</option>
+              <option value="follow">Follow</option>
+              <option value="hostile">Hostile</option>
+            </select>
+          </label>
+
+          <label>
+            Movement
+            <select name="movement">
+              <option value="stationary">Stationary</option>
+              <option value="slow-wander">Slow wander</option>
+              <option value="normal-wander">Normal wander</option>
+              <option value="short-patrol">Short patrol</option>
+              <option value="guard-area">Guard area</option>
+            </select>
+          </label>
+        </div>
+
+        <label>
+          Personality / acting notes
+          <textarea name="personality" rows="3" placeholder="Gruff, sarcastic, practical, secretly kind."></textarea>
+        </label>
+
+        <label>
+          Dialogue, one line per message
+          <textarea name="dialogue" rows="4">Aye, what do you need?
+Good steel costs good coin.</textarea>
+        </label>
+
+        <div class="checks">
+          <label><input type="checkbox" name="canTalk" value="true" checked /> Can talk</label>
+          <label><input type="checkbox" name="canTrade" value="true" /> Can trade</label>
+          <label><input type="checkbox" name="canGiveQuest" value="true" /> Can give quest</label>
+          <label><input type="checkbox" name="hostile" value="true" /> Hostile</label>
+        </div>
+
+        <h2>Procedural animation</h2>
+
+        <div class="three">
+          <label>
+            Idle bob
+            <input name="idleBob" type="number" value="1" min="0" max="8" />
+          </label>
+          <label>
+            Walk bob
+            <input name="walkBob" type="number" value="2" min="0" max="8" />
+          </label>
+          <label>
+            Sway
+            <input name="swayAmount" type="number" value="1" min="0" max="8" />
+          </label>
+        </div>
+
+        <button type="submit" id="generateBtn">Generate NESW character</button>
+      </form>
+
+      <section class="panel preview-panel">
+        <h2>Preview</h2>
+
+        <div class="preview-box" id="previewBox">
+          <span>No character generated yet.</span>
+        </div>
+
+        <div class="directions" id="directions"></div>
+
+        <div class="actions">
+          <button id="exportBtn" disabled>Export character pack ZIP</button>
+          <a id="downloadLink" class="download" hidden>Download ZIP</a>
+        </div>
+
+        <div class="log" id="log"></div>
+      </section>
+    </section>
+  </main>
+
+  <script src="./app.js" type="module"></script>
+</body>
+</html>
