@@ -1,0 +1,6 @@
+UPLOAD THIS OPTIMISED VERSION, NOT THE OLD ZIP.
+
+1. Unzip this package.
+2. Upload the CONTENTS of the unzipped folder to the repository root.
+3. Do not upload the ZIP file itself.
+4. This version converts large PNG assets to WebP while keeping the same pixel dimensions for the JSON layout.
