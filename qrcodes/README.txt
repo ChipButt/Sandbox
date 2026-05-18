@@ -1,0 +1,6 @@
+Astra HQ / Roll Britannia: ASTRA-HQ-AZUREBRINE (01-astra-hq-azurebrine.png)
+Venue 2: ASTRA-VENUE-2-CINDERCAP (02-venue-2-cindercap.png)
+Venue 3: ASTRA-VENUE-3-ECHOSHELL (03-venue-3-echoshell.png)
+Venue 4: ASTRA-VENUE-4-GLIMMERROOT (04-venue-4-glimmerroot.png)
+Venue 5: ASTRA-VENUE-5-HOLLOWCLAW (05-venue-5-hollowclaw.png)
+Venue 6: ASTRA-VENUE-6-NULLGLASS (06-venue-6-nullglass.png)

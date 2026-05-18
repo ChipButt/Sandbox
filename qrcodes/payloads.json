@@ -1,0 +1,32 @@
+[
+  {
+    "file": "01-astra-hq-azurebrine.png",
+    "payload": "ASTRA-HQ-AZUREBRINE",
+    "venue": "Astra HQ / Roll Britannia"
+  },
+  {
+    "file": "02-venue-2-cindercap.png",
+    "payload": "ASTRA-VENUE-2-CINDERCAP",
+    "venue": "Venue 2"
+  },
+  {
+    "file": "03-venue-3-echoshell.png",
+    "payload": "ASTRA-VENUE-3-ECHOSHELL",
+    "venue": "Venue 3"
+  },
+  {
+    "file": "04-venue-4-glimmerroot.png",
+    "payload": "ASTRA-VENUE-4-GLIMMERROOT",
+    "venue": "Venue 4"
+  },
+  {
+    "file": "05-venue-5-hollowclaw.png",
+    "payload": "ASTRA-VENUE-5-HOLLOWCLAW",
+    "venue": "Venue 5"
+  },
+  {
+    "file": "06-venue-6-nullglass.png",
+    "payload": "ASTRA-VENUE-6-NULLGLASS",
+    "venue": "Venue 6"
+  }
+]
