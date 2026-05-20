@@ -1,0 +1,16 @@
+ASTRA Field Terminal clean WebP asset fix
+
+Applied fixes:
+- Replaced all six anomaly display assets with the newly uploaded clean WebP files.
+- Removed outdated rarity-common, rarity-uncommon, rarity-rare, rarity-very-rare, rarity-legendary, and rarity-godlike image assets from the app package.
+- Removed the obsolete rarities array from data/content.js.
+- Bumped cache version strings so GitHub Pages/mobile Safari should fetch the corrected files.
+- Kept the anomaly WebP assets static in the UI: no legacy pulse, bob, zoom, glow-cycle, scale animation, or crop-grow behaviour.
+- Kept the scanner anomaly image in the original scanner box, centred with contain-fit so the whole clean WebP asset is visible.
+- Tightened the anomaly title sizing so longer names fit in the top title panel.
+- Moved the green inbox unread dot lower to the top point of the inbox icon area.
+- Kept home tracker anomaly nodes rotating with the tracker so their bases face toward the centre.
+- Strengthened touch/gesture locks to prevent two-finger browser zoom from shifting the UI.
+
+Note on rotation lock:
+Browser tabs on iPhone/Safari may ignore programmatic orientation lock. The manifest requests portrait for installed PWA mode, and the CSS keeps the ASTRA stage portrait-centred even if the browser itself rotates.
