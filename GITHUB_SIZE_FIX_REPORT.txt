@@ -1,0 +1,53 @@
+ASTRA GitHub size fix
+=====================
+
+This build removes unused duplicate anomaly WebP files and converts heavy PNG UI assets to WebP.
+No layout/positioning change was made for the anomaly display.
+The anomaly assets remain static-positioned and only play their own internal WebP animation.
+
+Converted PNG assets: 23
+- background-ui.png -> background-ui.webp: 2047.3 KB -> 85.5 KB
+- background-ui-back-button.png -> background-ui-back-button.webp: 1231.3 KB -> 101.7 KB
+- scanner-button.png -> scanner-button.webp: 619.6 KB -> 60.5 KB
+- map-vertical.png -> map-vertical.webp: 713.4 KB -> 80.7 KB
+- inbox-vertical.png -> inbox-vertical.webp: 750.5 KB -> 70.8 KB
+- data-log-button.png -> data-log-button.webp: 611.3 KB -> 59.6 KB
+- astronaut-profile-icon.png -> astronaut-profile-icon.webp: 895.3 KB -> 147.1 KB
+- home-screen-anomaly-tracker.png -> home-screen-anomaly-tracker.webp: 2061.4 KB -> 274.5 KB
+- rb-logo.png -> rb-logo.webp: 233.4 KB -> 38.6 KB
+- mail-ui.png -> mail-ui.webp: 2106.1 KB -> 104.1 KB
+- mail-open-icon.png -> mail-open-icon.webp: 2352.0 KB -> 227.1 KB
+- mail-closed-icon.png -> mail-closed-icon.webp: 2452.3 KB -> 206.5 KB
+- scanner-ui.png -> scanner-ui.webp: 370.6 KB -> 91.5 KB
+- specimen-ui.png -> specimen-ui.webp: 211.5 KB -> 124.2 KB
+- unknown-anomaly.png -> unknown-anomaly.webp: 1063.2 KB -> 175.5 KB
+- screen-icon.png -> screen-icon.webp: 616.6 KB -> 122.2 KB
+- rarity-common.png -> rarity-common.webp: 649.0 KB -> 28.6 KB
+- rarity-uncommon.png -> rarity-uncommon.webp: 503.9 KB -> 30.0 KB
+- rarity-rare.png -> rarity-rare.webp: 890.0 KB -> 61.4 KB
+- rarity-very-rare.png -> rarity-very-rare.webp: 662.5 KB -> 44.9 KB
+- rarity-legendary.png -> rarity-legendary.webp: 849.4 KB -> 63.0 KB
+- rarity-godlike.png -> rarity-godlike.webp: 962.4 KB -> 76.8 KB
+- data-log-ui.png -> data-log-ui.webp: 235.1 KB -> 147.9 KB
+
+Largest remaining files:
+- assets/anomaly-emberheart-fixed-static-position-20260520.webp: 2.84 MB
+- assets/anomaly-trackway-fixed-static-position-20260520.webp: 1.99 MB
+- assets/anomaly-sap-stump-fixed-static-position-20260520.webp: 1.71 MB
+- assets/anomaly-spore-crown-fixed-static-position-20260520.webp: 1.61 MB
+- assets/anomaly-pressure-vent-fixed-static-position-20260520.webp: 1.19 MB
+- assets/anomaly-liquid-basin-fixed-static-position-20260520.webp: 1.17 MB
+- assets/home-screen-anomaly-tracker.webp: 0.27 MB
+- assets/mail-open-icon.webp: 0.22 MB
+- assets/mail-closed-icon.webp: 0.20 MB
+- assets/unknown-anomaly.webp: 0.17 MB
+- assets/data-log-ui.webp: 0.14 MB
+- assets/astronaut-profile-icon.webp: 0.14 MB
+- assets/specimen-ui.webp: 0.12 MB
+- assets/screen-icon.webp: 0.12 MB
+- assets/mail-ui.webp: 0.10 MB
+- assets/background-ui-back-button.webp: 0.10 MB
+- assets/scanner-ui.webp: 0.09 MB
+- assets/background-ui.webp: 0.08 MB
+- assets/map-vertical.webp: 0.08 MB
+- assets/rarity-godlike.webp: 0.08 MB

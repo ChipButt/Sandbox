@@ -1,0 +1,10 @@
+ASTRA anomaly no-pulse/fit fix
+
+{"file": "anomaly-footprint-cyan-loop.webp", "frames": 16, "median_area": 439693.0, "replaced": [[13, 12]], "union": [26, 32, 768, 768], "target_max": 660, "new_size": [660, 655]}
+{"file": "anomaly-fungal-bloom-magenta-loop.webp", "frames": 14, "median_area": 288081.0, "replaced": [[11, 10]], "union": [77, 28, 768, 768], "target_max": 660, "new_size": [616, 660]}
+{"file": "anomaly-gas-vent-lime-loop.webp", "frames": 10, "median_area": 291602.5, "replaced": [], "union": [104, 14, 701, 768], "target_max": 660, "new_size": [523, 660]}
+{"file": "anomaly-geode-orange-loop.webp", "frames": 14, "median_area": 301308.5, "replaced": [], "union": [32, 35, 743, 728], "target_max": 660, "new_size": [660, 643]}
+{"file": "anomaly-liquid-basin-purple-loop.webp", "frames": 14, "median_area": 234503.5, "replaced": [[1, 2], [14, 13]], "union": [31, 38, 768, 768], "target_max": 660, "new_size": [660, 654]}
+{"file": "anomaly-sap-stump-gold-loop.webp", "frames": 14, "median_area": 356342.5, "replaced": [[5, 4], [13, 12]], "union": [54, 22, 768, 768], "target_max": 660, "new_size": [632, 660]}
+
+Version: 20260520-nopulse-fit-v3
