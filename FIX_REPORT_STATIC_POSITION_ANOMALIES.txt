@@ -1,0 +1,14 @@
+ASTRA Field Terminal anomaly static-position fix
+
+Changes:
+- Removed old app-level anomaly motion behaviour from scanner/data-log anomaly media.
+- Removed anomaly padding shrink introduced in earlier fixes.
+- Restored scanner anomaly display to the original layer box: x=163, y=510, width=756, height=756.
+- WebP anomaly assets are allowed to animate internally only.
+- Added unique WebP filenames and cache-busting version string to avoid GitHub Pages/iPhone Safari using stale pulsing files.
+- Added missing versionedAsset() helper so all app-loaded images get the cache-busting query string.
+
+Expected result:
+- Trackway appears at one stable size inside the scanner box.
+- No app-level pulsing/growing/shrinking/bobbing.
+- Any movement visible should come only from the WebP itself.
