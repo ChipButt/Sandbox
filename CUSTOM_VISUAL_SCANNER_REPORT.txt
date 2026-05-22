@@ -1,0 +1,15 @@
+ASTRA CUSTOM VISUAL SCANNER BUILD
+Version: 20260522-custom-visual-scanner-v1
+
+What changed:
+- The scanner now keeps the existing QR scan support.
+- The scanner also recognises the six ASTRA anomaly images directly using app-only visual target recognition.
+- The six printable scan target PNGs are included in:
+  assets/printable-anomaly-scan-targets/
+
+Important:
+- These are not normal QR codes.
+- A normal phone camera will not know what they are.
+- The ASTRA app recognises the image target/signature and maps it to the correct anomaly marker:
+  ASTRA:UKGE:ANOMALY-01 through ASTRA:UKGE:ANOMALY-06.
+- For best real-world scanning, print the image clearly and aim the scanner so the anomaly image fills most of the scanner view.
