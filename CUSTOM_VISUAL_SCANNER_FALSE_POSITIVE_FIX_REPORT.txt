@@ -1,0 +1,23 @@
+ASTRA custom scanner v2 - pattern lock false-positive fix
+
+Problem fixed:
+The previous custom scanner used colour-histogram matching as a fallback. Pink, gold, purple, green, cyan, or orange objects could therefore be misread as anomaly scans.
+
+What changed:
+- Removed all colour-only fallback scanning.
+- Replaced colour matching with spatial/pattern fingerprint recognition.
+- The scanner now compares the structure of the camera image against the six printable anomaly target images.
+- The same anomaly pattern must be recognised across 3 consecutive scan frames before it unlocks.
+- QR scanning still remains as a fallback for the original QR code assets.
+
+Correct visual-target mapping:
+- 01 Trackway Impression image -> ASTRA:UKGE:ANOMALY-01
+- 02 Spore-Crown Bloom image -> ASTRA:UKGE:ANOMALY-02
+- 03 Resonant Liquid Basin image -> ASTRA:UKGE:ANOMALY-05
+- 04 Pressure Gas Vent image -> ASTRA:UKGE:ANOMALY-03
+- 05 Luminous Sap Stump image -> ASTRA:UKGE:ANOMALY-06
+- 06 Emberheart Geode image -> ASTRA:UKGE:ANOMALY-04
+
+Expected behaviour:
+Random coloured objects should no longer unlock anomalies. The scan now needs the actual printed image pattern, not just a matching colour.
+For best results, aim the scanner so the printed anomaly image fills most of the scanner window and hold steady for around one second.
