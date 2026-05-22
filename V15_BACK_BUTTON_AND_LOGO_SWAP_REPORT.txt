@@ -1,0 +1,11 @@
+ASTRA v15 update
+
+Changes:
+- Replaced assets/background-ui-back-button.webp with the newly supplied back button asset.
+- Swapped the on-screen positions of the Roll Britannia logo and the back button on pages where both are present: scanner, dataLog, anomalyDetail, and map.
+- Updated both data/layout.json and the embedded layout in app.js.
+- Updated the map editor preview so it matches the swapped UI positions.
+
+New positions used:
+- Back button: x=825, y=45, width=200, height=80
+- RB logo: x=45, y=45, width=200, height=80

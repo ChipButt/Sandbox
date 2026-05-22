@@ -1,0 +1,11 @@
+ASTRA v14 map pin coordinate lock
+
+Problem fixed:
+- The editor preview used a 360x220 map canvas, but the live app placed pins and layers directly on the taller app UI map frame.
+- This could make pins appear to move away from the locations set in the editor.
+
+Fix:
+- Added a centred .map-coordinate-stage inside the app map frame.
+- Pins, zone boxes, and map layers now all render inside that same 360x220 coordinate stage.
+- Updated the editor screen preview mini map to use the same coordinate stage.
+- Bumped ASTRA_ASSET_VERSION and all index cache-busting query strings to avoid browser/GitHub cache mixing old and new files.

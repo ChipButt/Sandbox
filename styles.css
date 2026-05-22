@@ -1,0 +1,1242 @@
+
+:root{--stage-w:1080;--stage-h:1920;--scale:1;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;width:100%;height:100%;min-height:100%;overflow:hidden;background:#000;color:#2cff6a;font-family:var(--astra-font,Arial,sans-serif);overscroll-behavior:none;}
+body{position:fixed;inset:0;touch-action:manipulation;-webkit-user-select:none;user-select:none;}
+#app{position:fixed;left:0;top:0;width:100vw;height:100dvh;overflow:hidden;background:#000;touch-action:manipulation;}
+.stage{position:absolute;left:50%;top:50%;width:1080px;height:1920px;transform:translate(-50%,-50%) scale(var(--scale,1));transform-origin:center center;overflow:hidden;background:#000;will-change:transform;}
+.layer{position:absolute;transform-origin:center center;}
+.layer.image img,.home-anomaly-node img,.astra-adventures-home img{width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;user-select:none;}
+.layer.text{white-space:pre-wrap;overflow:hidden;text-shadow:none;line-height:1.15;display:flex;align-items:flex-start;justify-content:center;pointer-events:none;}
+.layer.text.align-left{justify-content:flex-start;text-align:left;}
+.layer.text.align-center{justify-content:center;text-align:center;}
+.layer.text.no-glow{text-shadow:none;}
+.layer.placeholder{overflow:hidden;background:#000;border:0;}
+.layer.placeholder video{width:100%;height:100%;object-fit:cover;display:block;}
+.clickable{cursor:pointer;pointer-events:auto;}
+.clickable img{pointer-events:none;}
+.slow-glow-pulse{animation:slowTextGlow 10s ease-in-out infinite;}
+.scanner-loading-status{overflow:visible!important;}
+.scanner-loading-status::after{content:'';animation:scanningDots 1.45s steps(1,end) infinite;}
+.scanner-data-found-status{animation:scannerDataFoundFlicker 1.05s steps(2,end) infinite;}
+.scanner-instruction-pulse{animation:scannerInstructionPulse 3.5s ease-in-out infinite;}
+.home-icon-attention-pulse{animation:homeIconAttentionPulse 3.5s ease-in-out infinite;}
+.data-log-entity-pulse{animation:none!important;}
+.anomaly-detail-entity{animation:none!important;}
+.anomaly-detail-entity img{transform:none!important;transform-origin:center center;image-rendering:auto;}
+.home-anomaly-node,.astra-adventures-home{position:absolute;}
+
+.home-inbox-unread-dot{
+  position:absolute;
+  left:61px;
+  top:92px;
+  width:24px;
+  height:24px;
+  margin-left:-12px;
+  border-radius:50%;
+  background:#2cff6a;
+  box-shadow:0 0 10px rgba(44,255,106,.95),0 0 24px rgba(44,255,106,.75);
+  z-index:20;
+  pointer-events:none;
+  animation:inboxUnreadDotPulse 1.05s ease-in-out infinite;
+}
+@keyframes inboxUnreadDotPulse{
+  0%,100%{opacity:1;transform:scale(1);box-shadow:0 0 8px rgba(44,255,106,.9),0 0 20px rgba(44,255,106,.65);}
+  45%{opacity:.35;transform:scale(.72);box-shadow:0 0 2px rgba(44,255,106,.4),0 0 8px rgba(44,255,106,.35);}
+  70%{opacity:1;transform:scale(1.18);box-shadow:0 0 14px rgba(44,255,106,1),0 0 34px rgba(44,255,106,.9);}
+}
+
+
+.home-tracker-rotating{animation:homeTrackerSpin 70s linear infinite;transform-origin:center center;overflow:visible;}
+.home-tracker-rotating > img{position:relative;z-index:1;}
+.home-tracker-rotating .home-anomaly-node{position:absolute;pointer-events:auto;}
+@keyframes homeTrackerSpin{from{transform:rotate(-60deg);}to{transform:rotate(300deg);}}
+.astra-adventures-home{filter:drop-shadow(0 0 12px rgba(46,220,255,.45));}
+@keyframes slowTextGlow{0%,100%{opacity:1;text-shadow:none;}50%{opacity:.72;text-shadow:none;}}
+@keyframes scannerDataFoundFlicker{0%,42%{opacity:.72;text-shadow:none;}43%,50%{opacity:.2;text-shadow:none;}51%,100%{opacity:1;text-shadow:none;}}
+@keyframes scanningDots{0%,24%{content:'.';}25%,49%{content:'..';}50%,74%{content:'...';}75%,100%{content:'';}}
+@keyframes scannerInstructionPulse{0%,100%{opacity:1;}50%{opacity:.46;}}
+@keyframes homeIconAttentionPulse{0%,100%{opacity:1;filter:drop-shadow(0 0 8px rgba(46,220,255,.35));}50%{opacity:.46;filter:drop-shadow(0 0 22px rgba(46,220,255,.9));}}
+@keyframes dataEntityPulse{0%,100%{filter:drop-shadow(0 0 3px var(--anomaly-glow-soft, rgba(46,220,255,.35)));transform:scale(1);}50%{filter:drop-shadow(0 0 14px var(--anomaly-glow-medium, rgba(46,220,255,.8)));transform:scale(1.035);}}
+@keyframes anomalyFloat{0%,100%{filter:drop-shadow(0 0 8px var(--anomaly-glow-soft, rgba(46,220,255,.45)));transform:translateY(0);}50%{filter:drop-shadow(0 0 22px var(--anomaly-glow-strong, rgba(46,220,255,.9)));transform:translateY(-10px);}}
+.popup-message{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(0,12,20,.96);border:2px solid #2edcff;color:#2edcff;font-family:var(--astra-font,Arial,sans-serif);font-size:30px;letter-spacing:.05em;line-height:1.18;text-align:center;padding:28px 34px;max-width:min(82vw,720px);min-width:min(70vw,560px);border-radius:18px;z-index:999999;box-shadow:0 0 30px rgba(46,220,255,.75), inset 0 0 24px rgba(46,220,255,.18);pointer-events:none;text-shadow:none;}
+.map-coming-soon{position:absolute;display:flex;align-items:center;justify-content:center;color:#2edcff;font-size:70px;text-align:center;letter-spacing:.08em;text-shadow:0 0 12px currentColor,0 0 30px currentColor;}
+.map-terminal{
+  position:absolute;
+  left:132px;
+  top:255px;
+  width:816px;
+  height:1268px;
+  color:#2cff6a;
+  font-family:var(--astra-font,Arial,sans-serif);
+  pointer-events:auto;
+  text-shadow:none;
+}
+.map-terminal-header{
+  position:absolute;
+  left:0;
+  top:0;
+  width:100%;
+  height:110px;
+  padding:14px 22px 0;
+  border:1px solid rgba(46,220,255,.68);
+  border-radius:8px;
+  background:linear-gradient(180deg,rgba(1,24,37,.86),rgba(2,10,18,.5));
+  box-shadow:0 0 24px rgba(46,220,255,.24), inset 0 0 30px rgba(46,220,255,.12);
+  overflow:hidden;
+}
+.map-kicker{
+  font-size:19px;
+  line-height:1;
+  letter-spacing:.13em;
+  color:#2edcff;
+}
+.map-title{
+  margin-top:7px;
+  font-size:38px;
+  line-height:.95;
+  letter-spacing:.055em;
+  color:#e9fbff;
+}
+.map-summary{
+  margin-top:7px;
+  font-size:16px;
+  line-height:1.12;
+  letter-spacing:.035em;
+  color:#2cff6a;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.map-main-frame{
+  position:absolute;
+  left:0;
+  top:128px;
+  width:816px;
+  height:610px;
+  border:2px solid rgba(46,220,255,.78);
+  border-radius:8px;
+  background:rgba(0,8,13,.86);
+  overflow:hidden;
+  box-shadow:0 0 32px rgba(46,220,255,.3), inset 0 0 42px rgba(46,220,255,.12);
+}
+.map-main-frame::before{
+  content:'';
+  position:absolute;
+  inset:14px;
+  border:1px solid rgba(44,255,106,.22);
+  pointer-events:none;
+  z-index:3;
+}
+.map-main-frame::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,rgba(46,220,255,.08),transparent 18%,transparent 82%,rgba(44,255,106,.08));
+  pointer-events:none;
+  z-index:4;
+}
+.map-main-image{
+  position:absolute;
+  left:0;
+  top:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:center center;
+  display:block;
+  user-select:none;
+  pointer-events:none;
+  transform:scale(1);
+  transition:transform .28s ease;
+}
+.map-main-frame.is-zone-view .map-main-image{
+  transform:scale(1.1);
+}
+.map-pin-layer{
+  position:absolute;
+  inset:0;
+  z-index:6;
+  pointer-events:none;
+}
+.map-hotspot-layer{
+  position:absolute;
+  inset:0;
+  z-index:5;
+  pointer-events:none;
+}
+.map-zone-hotspot{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  min-width:44px;
+  min-height:44px;
+  padding:0;
+  border:0;
+  background:transparent;
+  opacity:0;
+  pointer-events:auto;
+  cursor:pointer;
+}
+.map-pin{
+  --pin-color:#2edcff;
+  position:absolute;
+  width:44px;
+  height:44px;
+  margin-left:-22px;
+  margin-top:-22px;
+  padding:0;
+  border:2px solid rgba(234,251,255,.92);
+  border-radius:50%;
+  background:radial-gradient(circle,#ffffff 0 10%,var(--pin-color) 16% 44%,rgba(3,12,20,.35) 56% 100%);
+  box-shadow:0 0 12px var(--pin-color),0 0 26px var(--pin-color);
+  pointer-events:auto;
+  cursor:pointer;
+  animation:mapPinBlink 1.35s ease-in-out infinite;
+}
+.map-pin::after{
+  content:'';
+  position:absolute;
+  inset:-17px;
+  border:2px solid var(--pin-color);
+  border-radius:50%;
+  opacity:.55;
+  animation:mapPinRing 1.35s ease-out infinite;
+}
+.map-pin.is-active{
+  transform:scale(1.2);
+  border-color:#2cff6a;
+  box-shadow:0 0 18px #2cff6a,0 0 42px var(--pin-color);
+}
+.map-pin.is-logged{
+  border-color:#2cff6a;
+}
+.map-thumb-strip{
+  position:absolute;
+  left:0;
+  top:764px;
+  width:816px;
+  height:172px;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+}
+.map-thumb{
+  min-width:0;
+  height:172px;
+  padding:7px;
+  border:1px solid var(--zone-border,rgba(46,220,255,.58));
+  border-radius:8px;
+  background:linear-gradient(180deg,var(--zone-bg,rgba(46,220,255,.16)),rgba(0,16,27,.74));
+  box-shadow:0 0 14px var(--zone-glow,rgba(46,220,255,.18)), inset 0 0 22px rgba(234,251,255,.08);
+  color:var(--zone-color,#2edcff);
+  font-family:var(--astra-font,Arial,sans-serif);
+  cursor:pointer;
+  overflow:hidden;
+  pointer-events:auto;
+}
+.map-thumb img{
+  width:100%;
+  height:110px;
+  object-fit:cover;
+  display:block;
+  border:1px solid var(--zone-border,rgba(234,251,255,.18));
+  background:#020b12;
+  box-shadow:inset 0 0 20px var(--zone-glow,rgba(46,220,255,.14));
+  pointer-events:none;
+}
+.map-thumb span{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:38px;
+  margin-top:6px;
+  font-size:15px;
+  line-height:1;
+  letter-spacing:.08em;
+  color:var(--zone-color,#e9fbff);
+  text-shadow:0 0 9px currentColor;
+  text-align:center;
+  white-space:nowrap;
+}
+.map-thumb:active,
+.map-thumb.is-active{
+  border-color:#e9fbff;
+  box-shadow:0 0 22px var(--zone-glow,rgba(44,255,106,.26)), inset 0 0 26px var(--zone-bg,rgba(44,255,106,.12));
+}
+.map-intel-panel{
+  position:absolute;
+  left:0;
+  top:962px;
+  width:816px;
+  height:258px;
+  padding:22px 24px;
+  border:1px solid rgba(44,255,106,.62);
+  border-radius:8px;
+  background:linear-gradient(180deg,rgba(0,18,26,.86),rgba(0,10,16,.68));
+  box-shadow:0 0 26px rgba(44,255,106,.16), inset 0 0 30px rgba(44,255,106,.1);
+  overflow:hidden;
+}
+.map-intel-label{
+  font-size:18px;
+  letter-spacing:.14em;
+  color:#2edcff;
+}
+.map-intel-title{
+  margin-top:10px;
+  font-size:30px;
+  line-height:1;
+  letter-spacing:.055em;
+  color:#e9fbff;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.map-intel-body{
+  margin-top:15px;
+  font-size:22px;
+  line-height:1.24;
+  letter-spacing:.035em;
+  color:#2cff6a;
+  white-space:pre-line;
+}
+@keyframes mapPinBlink{
+  0%,100%{opacity:1;filter:brightness(1);}
+  48%{opacity:.72;filter:brightness(.82);}
+  70%{opacity:1;filter:brightness(1.35);}
+}
+@keyframes mapPinRing{
+  0%{transform:scale(.55);opacity:.68;}
+  100%{transform:scale(1.42);opacity:0;}
+}
+.profile-panel{position:absolute;left:130px;top:300px;width:820px;height:1000px;border:1px solid #2edcff;background:rgba(0,18,30,.72);box-shadow:0 0 30px rgba(46,220,255,.35), inset 0 0 30px rgba(46,220,255,.14);padding:46px;color:#2cff6a;text-shadow:none;pointer-events:auto;overflow:visible;}
+.profile-panel h1{margin:0 0 34px;text-align:center;font-size:44px;color:#2edcff;text-shadow:none;}
+.profile-panel label{display:block;font-size:25px;margin:20px 0;line-height:1.22;text-shadow:none;position:relative;z-index:5;pointer-events:auto;}
+.profile-panel input[type=text],.profile-panel input[type=email],.profile-panel input:not([type]){display:block;width:100%;height:74px;margin-top:12px;font-family:var(--astra-font,Arial,sans-serif);font-size:30px;color:#2cff6a;background:#020b12;border:1px solid #2edcff;padding:14px 18px;outline:none;box-shadow:inset 0 0 14px rgba(46,220,255,.18);position:relative;z-index:20;pointer-events:auto;-webkit-user-select:text;user-select:text;}
+.profile-panel .check{display:flex;gap:18px;align-items:flex-start;font-size:19px;line-height:1.22;margin:22px 0;position:relative;z-index:20;pointer-events:auto;}
+.profile-panel input[type=checkbox]{width:28px;height:28px;min-width:28px;accent-color:#2edcff;flex:0 0 auto;position:relative;z-index:30;pointer-events:auto;}
+.profile-panel button,.simulate-scan-button{font-family:var(--astra-font,Arial,sans-serif);color:#2edcff;background:#020b12;border:1px solid #2edcff;text-shadow:0 0 8px currentColor;box-shadow:0 0 18px rgba(46,220,255,.28);cursor:pointer;}
+.profile-panel button{display:block;margin:54px auto 0;padding:18px 36px;font-size:30px;position:relative;z-index:40;pointer-events:auto;}
+.simulate-scan-button{position:absolute;left:355px;top:1680px;width:370px;height:70px;z-index:260;font-size:26px;}
+
+/* Inbox fixes */
+.inbox-scroll-list{position:absolute;left:118px;top:508px;width:250px;height:820px;overflow-y:auto;overflow-x:hidden;pointer-events:auto;padding-bottom:12px;scrollbar-width:thin;scrollbar-color:#2edcff transparent;}
+.inbox-scroll-list::-webkit-scrollbar{width:5px;}.inbox-scroll-list::-webkit-scrollbar-thumb{background:#2edcff;border-radius:4px;}.inbox-scroll-list::-webkit-scrollbar-track{background:transparent;}
+.inbox-message-row{position:absolute;left:0;width:235px;height:110px;pointer-events:auto;}
+.inbox-message-icon{position:absolute;left:12px;top:0;width:72px;height:110px;object-fit:contain;display:block;}
+.inbox-message-title{position:absolute;left:92px;top:30px;width:135px;height:70px;overflow:hidden;font-family:var(--astra-font,Arial,sans-serif);font-size:15px;line-height:1.14;letter-spacing:.05em;color:#2cff6a;text-shadow:none;text-align:left;}
+.active-message-scroll{overflow-y:auto!important;overflow-x:hidden!important;display:block!important;pointer-events:auto!important;padding-right:12px;scrollbar-width:thin;scrollbar-color:#2cff6a transparent;text-shadow:none!important;}
+.active-message-scroll::-webkit-scrollbar{width:6px;}.active-message-scroll::-webkit-scrollbar-thumb{background:#2cff6a;border-radius:4px;}.active-message-scroll::-webkit-scrollbar-track{background:transparent;}
+.inbox-active-header{overflow:visible!important;display:block!important;align-items:flex-start!important;text-shadow:none!important;}
+/* Fixed: popup styling must not affect the profile form or scan button. */
+
+.page-dataLog .layer.text{overflow:hidden;text-shadow:none!important;}
+
+
+/* Mobile portrait stability fixes */
+html,body{height:100%;overflow:hidden;background:#000;}
+body{position:fixed;inset:0;overflow:hidden;}
+#app{position:fixed;left:0;top:0;width:100vw;height:var(--locked-app-height,100svh);max-height:var(--locked-app-height,100svh);overflow:hidden;background:#000;}
+.stage{left:50%;top:50%;transform:translate(-50%,-50%) scale(var(--scale,1));transform-origin:center center;}
+@media (orientation: landscape){
+  #app{width:100vw;height:100vh;}
+  .stage{left:50%;top:50%;}
+}
+.profile-panel{position:absolute;left:130px;top:300px;width:820px;height:1000px;border:1px solid #2edcff;background:rgba(0,18,30,.72);box-shadow:0 0 30px rgba(46,220,255,.35), inset 0 0 30px rgba(46,220,255,.14);padding:46px;color:#2cff6a;text-shadow:none;pointer-events:auto;overflow:visible;}
+.profile-panel input{font-size:34px!important;}
+.profile-panel input:focus{font-size:34px!important;}
+.active-message-scroll{font-size:34px!important;line-height:1.16!important;-webkit-overflow-scrolling:touch;}
+.inbox-active-header{font-size:36px!important;line-height:1.12!important;}
+.page-scanner .layer.text[data-layer-name="Anomaly Info 1"],
+.page-scanner .layer.text[data-layer-name="Anomaly Info 2"],
+.page-scanner .layer.text[data-layer-name="Anomaly Info 3"]{
+  font-size:27px!important;line-height:1.05!important;align-items:center!important;
+}
+
+.profile-panel *, .profile-panel input, .profile-panel button, .profile-panel label{pointer-events:auto;}
+
+/* Agent Profile form: stage-positioned, clickable, and kept clear of the background artwork. */
+.profile-panel{
+  position:absolute;
+  left:130px;
+  top:300px;
+  width:820px;
+  height:auto;
+  min-height:960px;
+  border:1px solid #2edcff;
+  border-radius:14px;
+  background:rgba(0,18,30,.72);
+  box-shadow:0 0 30px rgba(46,220,255,.35), inset 0 0 30px rgba(46,220,255,.14);
+  padding:46px;
+  color:#2cff6a;
+  text-shadow:none;
+  pointer-events:auto;
+  overflow:visible;
+}
+.profile-panel h1{
+  position:static;
+  transform:none;
+  margin:0 0 34px;
+  padding:0;
+  min-width:0;
+  max-width:none;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  text-align:center;
+  font-size:44px;
+  line-height:1.15;
+  color:#2edcff;
+  pointer-events:none;
+}
+.profile-panel label{
+  display:block;
+  position:relative;
+  z-index:5;
+  margin:20px 0;
+  font-size:25px;
+  line-height:1.22;
+  text-align:left;
+  color:#2cff6a;
+  pointer-events:auto;
+}
+.profile-panel input[type=text],
+.profile-panel input[type=email],
+.profile-panel input:not([type]){
+  display:block;
+  position:relative;
+  z-index:20;
+  width:100%;
+  height:74px;
+  margin-top:12px;
+  padding:14px 18px;
+  font-family:var(--astra-font,Arial,sans-serif);
+  font-size:34px!important;
+  color:#2cff6a;
+  background:#020b12;
+  border:1px solid #2edcff;
+  outline:none;
+  box-shadow:inset 0 0 14px rgba(46,220,255,.18);
+  pointer-events:auto;
+  -webkit-user-select:text;
+  user-select:text;
+}
+.profile-panel .check{
+  display:flex;
+  gap:18px;
+  align-items:flex-start;
+  position:relative;
+  z-index:20;
+  margin:22px 0;
+  font-size:19px;
+  line-height:1.22;
+  color:#2cff6a;
+  pointer-events:auto;
+}
+.profile-panel input[type=checkbox]{
+  width:28px;
+  height:28px;
+  min-width:28px;
+  accent-color:#2edcff;
+  flex:0 0 auto;
+  position:relative;
+  z-index:30;
+  pointer-events:auto;
+}
+.profile-panel button{
+  display:block;
+  position:relative;
+  z-index:40;
+  margin:54px auto 0;
+  padding:18px 36px;
+  min-width:0;
+  max-width:none;
+  transform:none;
+  font-family:var(--astra-font,Arial,sans-serif);
+  font-size:30px;
+  letter-spacing:.05em;
+  color:#2edcff;
+  background:#020b12;
+  border:1px solid #2edcff;
+  border-radius:8px;
+  text-shadow:0 0 8px currentColor;
+  box-shadow:0 0 18px rgba(46,220,255,.28);
+  cursor:pointer;
+  pointer-events:auto;
+}
+.profile-panel button:active{transform:translateY(1px);}
+.profile-panel *, .profile-panel input, .profile-panel button, .profile-panel label{pointer-events:auto;}
+
+
+/* 2026-05 display / loading / anomaly animation fixes */
+#app{
+  position:fixed!important;
+  left:0!important;
+  top:0!important;
+  width:100vw!important;
+  height:var(--locked-app-height,100dvh)!important;
+  max-height:var(--locked-app-height,100dvh)!important;
+  overflow:hidden!important;
+  background:#000!important;
+}
+.stage{
+  left:50%!important;
+  top:50%!important;
+  transform:translate(-50%,-50%) scale(var(--scale,1))!important;
+  transform-origin:center center!important;
+}
+
+/* Keep text, icons, anomaly nodes and dynamic content hidden until the page UI frame has loaded. */
+.stage.ui-loading .layer:not(.critical-ui-layer),
+.stage.ui-loading .home-anomaly-node,
+.stage.ui-loading .astra-adventures-home,
+.stage.ui-loading .inbox-scroll-list,
+.stage.ui-loading .profile-panel,
+.stage.ui-loading .map-terminal,
+.stage.ui-loading .map-coming-soon,
+.stage.ui-loading .simulate-scan-button{
+  visibility:hidden!important;
+}
+.stage.ui-loading .critical-ui-layer{visibility:visible!important;}
+
+/* Animated anomaly files already contain their own motion. Do not add CSS pulse, bob, grow/shrink, or glow cycling. */
+.data-log-entity-pulse,
+.anomaly-detail-entity{
+  animation:none!important;
+  filter:none!important;
+  transform:none!important;
+}
+.data-log-entity-pulse img{
+  animation:none!important;
+  filter:none!important;
+  transform:none!important;
+}
+.anomaly-detail-entity img{
+  animation:none!important;
+  filter:none!important;
+  transform:none!important;
+  transform-origin:center center!important;
+  image-rendering:auto;
+}
+
+
+/* 2026-05-20 hard anomaly media lock
+   Animated anomaly files contain their own motion. The app must not pulse, bob, scale, glow-cycle, or crop them. */
+.layer.anomaly-detail-entity,
+.layer.data-log-entity-static,
+.home-anomaly-node.anomaly-media-static,
+.layer.anomaly-media-static{
+  animation:none!important;
+  transition:none!important;
+  transform:none!important;
+  filter:none!important;
+  overflow:visible!important;
+}
+.layer.anomaly-detail-entity img,
+.layer.data-log-entity-static img,
+.home-anomaly-node.anomaly-media-static img,
+.layer.anomaly-media-static img{
+  animation:none!important;
+  transition:none!important;
+  transform:none!important;
+  filter:none!important;
+  width:100%!important;
+  height:100%!important;
+  max-width:100%!important;
+  max-height:100%!important;
+  object-fit:contain!important;
+  object-position:center center!important;
+  display:block!important;
+}
+/* The scanner specimen window was being filled too aggressively. Add fixed inner breathing room so the full anomaly remains visible. */
+.page-scanner .layer.anomaly-detail-entity{
+  padding:58px!important;
+}
+.page-dataLog .layer.data-log-entity-static{
+  padding:6px!important;
+}
+.home-anomaly-node.anomaly-media-static{
+  padding:4px!important;
+}
+
+
+/* 20260520-nopulse-fit-v3: final anomaly media fit lock.
+   WebP anomaly loops already contain the animation. The app must not add scale/pulse/bob/filter animation.
+   Padding uses border-box so it shrinks the image area instead of making the absolute layer larger. */
+.layer.anomaly-detail-entity,
+.layer.data-log-entity-static,
+.layer.anomaly-media-static,
+.home-anomaly-node.anomaly-media-static{
+  box-sizing:border-box!important;
+  animation:none!important;
+  transition:none!important;
+  transform:none!important;
+  filter:none!important;
+  overflow:visible!important;
+}
+.layer.anomaly-detail-entity *,
+.layer.data-log-entity-static *,
+.layer.anomaly-media-static *,
+.home-anomaly-node.anomaly-media-static *{
+  animation:none!important;
+  transition:none!important;
+  transform:none!important;
+  filter:none!important;
+}
+.page-scanner .layer.anomaly-detail-entity{
+  padding:92px!important;
+  box-sizing:border-box!important;
+}
+.page-scanner .layer.anomaly-detail-entity img{
+  width:100%!important;
+  height:100%!important;
+  object-fit:contain!important;
+  object-position:center center!important;
+  display:block!important;
+}
+.page-dataLog .layer.data-log-entity-static{
+  padding:12px!important;
+  box-sizing:border-box!important;
+}
+.home-anomaly-node.anomaly-media-static{
+  padding:7px!important;
+  box-sizing:border-box!important;
+}
+
+
+/* 20260520-static-position-v4
+   Anomaly media rule lock:
+   The WebP files already contain their own animation. The app must keep only the original layout box/position/scale.
+   No old CSS pulse, bob, float, grow/shrink, padding shrink, filter glow cycle, or JS transform should affect anomaly media. */
+.layer.anomaly-detail-entity,
+.layer.data-log-entity-pulse,
+.layer.data-log-entity-static,
+.layer.anomaly-media-static,
+.home-anomaly-node.anomaly-media-static{
+  animation:none!important;
+  transition:none!important;
+  filter:none!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  overflow:visible!important;
+}
+.layer.anomaly-detail-entity,
+.layer.data-log-entity-pulse,
+.layer.data-log-entity-static,
+.layer.anomaly-media-static{
+  transform:rotate(0deg)!important;
+}
+.layer.anomaly-detail-entity img,
+.layer.data-log-entity-pulse img,
+.layer.data-log-entity-static img,
+.layer.anomaly-media-static img,
+.home-anomaly-node.anomaly-media-static img{
+  width:100%!important;
+  height:100%!important;
+  max-width:100%!important;
+  max-height:100%!important;
+  object-fit:contain!important;
+  object-position:center center!important;
+  display:block!important;
+  animation:none!important;
+  transition:none!important;
+  transform:none!important;
+  filter:none!important;
+}
+.page-scanner .layer.anomaly-media-static{
+  left:163px!important;
+  top:510px!important;
+  width:756px!important;
+  height:756px!important;
+  padding:0!important;
+}
+
+
+/* 20260520 final fixes */
+html,body,#app{overscroll-behavior:none!important;}
+body,#app{touch-action:manipulation!important;}
+.home-tracker-rotating .home-anomaly-node{transform-origin:center center!important;}
+.home-tracker-rotating .home-anomaly-node img{width:100%!important;height:100%!important;object-fit:contain!important;object-position:center center!important;}
+.page-scanner .layer.anomaly-media-static{left:163px!important;top:510px!important;width:756px!important;height:756px!important;overflow:hidden!important;padding:0!important;}
+.page-scanner .layer.anomaly-media-static img{width:100%!important;height:100%!important;object-fit:contain!important;object-position:center center!important;}
+.page-scanner .layer.text[data-layer-name="ANOMALY NAME"]{display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;white-space:pre-wrap!important;overflow:visible!important;}
+.active-message-scroll{padding-right:18px!important;line-height:1.12!important;}
+
+
+/* 20260521 scaling + home-orientation fixes */
+.home-tracker-rotating .home-anomaly-node{transform:none!important;}
+.home-tracker-rotating .home-anomaly-node img{transform-origin:center center!important;}
+.page-scanner .layer.anomaly-media-static{display:block!important; overflow:hidden!important;}
+.page-scanner .layer.anomaly-media-static img{
+  position:absolute!important;
+  left:50%!important;
+  top:50%!important;
+  transform:translate(-50%,-50%)!important;
+  width:auto!important;
+  height:auto!important;
+  max-width:84%!important;
+  max-height:84%!important;
+  object-fit:contain!important;
+  object-position:center center!important;
+}
+.page-scanner .layer.text[data-layer-name="ANOMALY NAME"]{
+  width:640px!important;
+  left:220px!important;
+  line-height:0.98!important;
+  letter-spacing:0.03em!important;
+}
+
+
+/* 20260521-clean-webp-v1 final lock
+   Uploaded clean WebP anomaly assets are used directly. No legacy rarity art, no image pulse, no crop-grow, no extra filter animation. */
+html,body,#app{
+  touch-action:none!important;
+  -ms-touch-action:none!important;
+  overscroll-behavior:none!important;
+  -webkit-text-size-adjust:100%!important;
+}
+body{
+  user-select:none!important;
+  -webkit-user-select:none!important;
+  -webkit-touch-callout:none!important;
+}
+.profile-panel input,
+.profile-panel label,
+.profile-panel button{
+  user-select:auto!important;
+  -webkit-user-select:auto!important;
+}
+.home-inbox-unread-dot{
+  left:61px!important;
+  top:92px!important;
+}
+.page-scanner .layer.anomaly-media-static{
+  left:163px!important;
+  top:510px!important;
+  width:756px!important;
+  height:756px!important;
+  overflow:visible!important;
+  padding:0!important;
+  transform:rotate(0deg)!important;
+  animation:none!important;
+  transition:none!important;
+  filter:none!important;
+}
+.page-scanner .layer.anomaly-media-static img{
+  position:absolute!important;
+  left:50%!important;
+  top:50%!important;
+  width:auto!important;
+  height:auto!important;
+  max-width:84%!important;
+  max-height:84%!important;
+  object-fit:contain!important;
+  object-position:center center!important;
+  transform:translate(-50%,-50%)!important;
+  animation:none!important;
+  transition:none!important;
+  filter:none!important;
+}
+.page-scanner .layer.text[data-layer-name="ANOMALY NAME"]{
+  left:180px!important;
+  width:720px!important;
+  height:110px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  line-height:.96!important;
+  letter-spacing:.015em!important;
+  white-space:normal!important;
+  overflow:visible!important;
+  text-align:center!important;
+}
+.home-tracker-rotating .home-anomaly-node{
+  transform-origin:center center!important;
+  animation:none!important;
+  transition:none!important;
+  filter:none!important;
+}
+.home-tracker-rotating .home-anomaly-node img{
+  width:100%!important;
+  height:100%!important;
+  object-fit:contain!important;
+  object-position:center center!important;
+  animation:none!important;
+  transition:none!important;
+  filter:none!important;
+}
+.active-message-scroll{
+  white-space:pre-wrap!important;
+  line-height:1.18!important;
+}
+@media (orientation: landscape){
+  #app{background:#000!important; overflow:hidden!important;}
+  .stage{left:50%!important; top:50%!important; transform:translate(-50%,-50%) scale(var(--scale,1))!important;}
+}
+
+
+/* 20260521 animated loop asset + title centering fixes */
+.page-scanner .layer.text[data-layer-name="ANOMALY NAME"]{
+  left:180px!important;
+  top:392px!important;
+  width:720px!important;
+  height:96px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  box-sizing:border-box!important;
+  padding-top:6px!important;
+  line-height:0.96!important;
+  letter-spacing:0.015em!important;
+  white-space:normal!important;
+  overflow:visible!important;
+}
+.page-scanner .layer.anomaly-media-static,
+.page-scanner .layer.anomaly-media-static img{
+  animation:none!important;
+  transition:none!important;
+  filter:none!important;
+}
+
+
+/* 20260521 home hub radial anomaly orientation fix
+   The anomaly thumbnails are children of the rotating hub, so they rotate with the hub.
+   This transform only locks each thumbnail's base/bottom toward the hub centre. */
+.home-tracker-rotating .home-anomaly-node.anomaly-media-static img,
+.home-tracker-rotating .home-anomaly-node img{
+  transform:rotate(var(--node-radial-rotation, 0deg))!important;
+  transform-origin:center center!important;
+  animation:none!important;
+  transition:none!important;
+}
+
+/* Shared animated space background layer inside the main ASTRA frame. */
+.space-background-layer{
+  position:absolute;
+  overflow:hidden;
+  pointer-events:none;
+  background:#020812;
+  opacity:.92;
+  box-shadow:inset 0 0 80px rgba(46,220,255,.08);
+}
+.space-background-video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center center;
+  display:block;
+  pointer-events:none;
+}
+
+
+/* Feathered edge blend for central space video layer */
+.space-background-layer::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(to right,
+      rgba(2,8,18,0.96) 0px,
+      rgba(2,8,18,0.82) 18px,
+      rgba(2,8,18,0.42) 44px,
+      rgba(2,8,18,0.12) 78px,
+      rgba(2,8,18,0.00) 112px,
+      rgba(2,8,18,0.00) calc(100% - 112px),
+      rgba(2,8,18,0.12) calc(100% - 78px),
+      rgba(2,8,18,0.42) calc(100% - 44px),
+      rgba(2,8,18,0.82) calc(100% - 18px),
+      rgba(2,8,18,0.96) 100%),
+    linear-gradient(to bottom,
+      rgba(2,8,18,0.98) 0px,
+      rgba(2,8,18,0.86) 18px,
+      rgba(2,8,18,0.48) 44px,
+      rgba(2,8,18,0.14) 78px,
+      rgba(2,8,18,0.00) 112px,
+      rgba(2,8,18,0.00) calc(100% - 112px),
+      rgba(2,8,18,0.14) calc(100% - 78px),
+      rgba(2,8,18,0.48) calc(100% - 44px),
+      rgba(2,8,18,0.86) calc(100% - 18px),
+      rgba(2,8,18,0.98) 100%);
+  mix-blend-mode:normal;
+}
+
+
+/* 20260521 discovery sequence + scanner title alignment */
+.page-scanner .layer.text[data-layer-name="ANOMALY NAME"]{
+  top:382px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  padding-top:0!important;
+}
+.page-scanner .anomaly-media-static img{
+  will-change:opacity;
+}
+
+/* 20260522 v7 map editing + softer UI loading update */
+:root{
+  --astra-font:'ASTRA','Astra','Orbitron','Rajdhani','Eurostile','Bank Gothic','Arial Narrow',Arial,sans-serif;
+}
+html,body,.layer.text,.popup-message,.profile-panel,.profile-panel input,.profile-panel button,.simulate-scan-button{
+  font-family:var(--astra-font)!important;
+}
+.route-loader{
+  position:fixed;
+  inset:0;
+  z-index:999998;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:radial-gradient(circle at 50% 44%,rgba(0,42,62,.72),rgba(0,5,10,.98) 58%,#000 100%);
+  pointer-events:none;
+  opacity:1;
+  transition:opacity .24s ease;
+}
+.route-loader.is-hiding{opacity:0;}
+.route-loader-panel{
+  width:min(76vw,560px);
+  padding:32px 28px 28px;
+  border:1px solid rgba(46,220,255,.62);
+  border-radius:18px;
+  background:linear-gradient(180deg,rgba(0,24,36,.9),rgba(0,9,16,.84));
+  box-shadow:0 0 38px rgba(46,220,255,.42), inset 0 0 36px rgba(46,220,255,.16);
+  text-align:center;
+  color:#2edcff;
+  font-family:var(--astra-font)!important;
+  letter-spacing:.1em;
+}
+.route-loader-title{
+  font-size:30px;
+  line-height:1.1;
+  text-shadow:0 0 12px rgba(46,220,255,.75);
+}
+.route-loader-dots{
+  display:flex;
+  justify-content:center;
+  gap:18px;
+  margin-top:24px;
+}
+.route-loader-dots span{
+  width:16px;
+  height:16px;
+  border-radius:50%;
+  background:#2edcff;
+  box-shadow:0 0 14px rgba(46,220,255,.95),0 0 34px rgba(46,220,255,.55);
+  animation:routeDotPulse 1.15s ease-in-out infinite;
+}
+.route-loader-dots span:nth-child(2){animation-delay:.18s;}
+.route-loader-dots span:nth-child(3){animation-delay:.36s;}
+@keyframes routeDotPulse{
+  0%,100%{opacity:.22;transform:scale(.72);filter:blur(.2px);}
+  45%{opacity:1;transform:scale(1.18);filter:blur(0);}
+}
+.back-button-glow{
+  filter:drop-shadow(0 0 16px rgba(46,220,255,.92)) drop-shadow(0 0 38px rgba(46,220,255,.54));
+}
+.back-button-glow::before{
+  content:'';
+  position:absolute;
+  inset:12px 74px 8px 18px;
+  border-radius:42px;
+  background:radial-gradient(ellipse at 28% 50%,rgba(46,220,255,.46),rgba(46,220,255,.18) 46%,rgba(46,220,255,0) 78%);
+  box-shadow:0 0 34px rgba(46,220,255,.56);
+  animation:backButtonBlueGlow 2.4s ease-in-out infinite;
+  pointer-events:none;
+  z-index:-1;
+}
+@keyframes backButtonBlueGlow{
+  0%,100%{opacity:.62;filter:blur(.2px);}
+  50%{opacity:1;filter:blur(1px);}
+}
+.map-terminal,.map-terminal *{
+  font-family:var(--astra-font)!important;
+}
+.map-terminal-header{
+  height:124px;
+  padding-top:16px;
+}
+.map-kicker{font-size:20px;letter-spacing:.16em;text-shadow:0 0 9px rgba(46,220,255,.72);}
+.map-title{font-size:40px;letter-spacing:.075em;text-shadow:0 0 10px rgba(233,251,255,.45);}
+.map-summary{font-size:17px;letter-spacing:.055em;text-shadow:0 0 8px rgba(44,255,106,.38);}
+.map-zone-hotspot{
+  opacity:1!important;
+  border:1px solid rgba(46,220,255,.58);
+  border-radius:12px;
+  background:radial-gradient(ellipse at center,rgba(46,220,255,.12),rgba(0,12,20,.02) 72%);
+  box-shadow:0 0 18px rgba(46,220,255,.28), inset 0 0 22px rgba(46,220,255,.12);
+  backdrop-filter:blur(.4px);
+  animation:zoneHotspotBreath 3.4s ease-in-out infinite;
+}
+.map-zone-hotspot span{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  width:92%;
+  color:#e9fbff;
+  font-size:20px;
+  line-height:1;
+  letter-spacing:.08em;
+  text-align:center;
+  text-shadow:0 0 10px var(--hotspot-color,#2edcff),0 0 22px rgba(46,220,255,.55);
+  pointer-events:none;
+}
+@keyframes zoneHotspotBreath{
+  0%,100%{opacity:.56;box-shadow:0 0 12px rgba(46,220,255,.22), inset 0 0 18px rgba(46,220,255,.1);}
+  50%{opacity:.92;box-shadow:0 0 28px rgba(46,220,255,.42), inset 0 0 32px rgba(46,220,255,.18);}
+}
+.map-pin{
+  width:50px;
+  height:50px;
+  margin-left:-25px;
+  margin-top:-25px;
+  border:0!important;
+  background:radial-gradient(circle,rgba(255,255,255,.95) 0 7%,var(--pin-color,#2edcff) 13% 28%,rgba(46,220,255,.28) 42%,rgba(46,220,255,0) 70%);
+  box-shadow:0 0 18px var(--pin-color,#2edcff),0 0 44px rgba(46,220,255,.46);
+  animation:mapPinSoftPulse 1.9s ease-in-out infinite;
+}
+.map-pin::after{
+  inset:-18px;
+  border:0!important;
+  background:radial-gradient(circle,rgba(255,255,255,0) 34%,rgba(46,220,255,.24) 46%,rgba(255,255,255,0) 66%);
+  box-shadow:0 0 30px rgba(46,220,255,.32);
+  animation:mapPinSoftHalo 1.9s ease-out infinite;
+}
+.map-pin.is-active{
+  transform:scale(1.18);
+  box-shadow:0 0 20px #2cff6a,0 0 56px var(--pin-color,#2edcff);
+}
+@keyframes mapPinSoftPulse{
+  0%,100%{opacity:.7;filter:brightness(.94) blur(.1px);transform:scale(.92);}
+  52%{opacity:1;filter:brightness(1.32) blur(0);transform:scale(1.08);}
+}
+@keyframes mapPinSoftHalo{
+  0%{opacity:.58;transform:scale(.64);}
+  100%{opacity:0;transform:scale(1.58);}
+}
+
+
+/* 20260522 v8: UI layout editor + in-terminal loading overlay */
+.stage.ui-loading .layer:not(.critical-ui-layer),
+.stage.ui-loading .home-anomaly-node,
+.stage.ui-loading .astra-adventures-home,
+.stage.ui-loading .inbox-scroll-list,
+.stage.ui-loading .profile-panel,
+.stage.ui-loading .map-terminal,
+.stage.ui-loading .map-coming-soon,
+.stage.ui-loading .simulate-scan-button{
+  visibility:hidden!important;
+}
+.stage.ui-loading .critical-ui-layer{visibility:visible!important;}
+.route-loader{
+  position:fixed;
+  inset:0;
+  z-index:999998;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:transparent!important;
+  pointer-events:none;
+  opacity:1;
+  transition:opacity .2s ease;
+}
+.route-loader-panel{
+  width:min(48vw,330px);
+  min-width:220px;
+  padding:18px 18px 16px;
+  border:1px solid rgba(46,220,255,.7);
+  border-radius:14px;
+  background:linear-gradient(180deg,rgba(0,25,40,.86),rgba(0,9,16,.72));
+  box-shadow:0 0 28px rgba(46,220,255,.42), inset 0 0 26px rgba(46,220,255,.16);
+  text-align:center;
+  color:#2edcff;
+  font-family:var(--astra-font)!important;
+  letter-spacing:.13em;
+  backdrop-filter:blur(2px);
+}
+.route-loader-title{
+  font-size:22px;
+  line-height:1;
+  text-transform:uppercase;
+  text-shadow:0 0 11px rgba(46,220,255,.75);
+}
+.route-loader-dots{gap:10px;margin-top:14px;}
+.route-loader-dots span{width:10px;height:10px;filter:blur(.15px);}
+.back-button-glow{filter:drop-shadow(0 0 20px rgba(46,220,255,1)) drop-shadow(0 0 48px rgba(46,220,255,.72));}
+.map-terminal,.map-terminal *{
+  font-family:var(--astra-font)!important;
+  text-transform:uppercase;
+  letter-spacing:.075em;
+}
+.map-terminal-header,.map-main-frame,.map-thumb-strip,.map-intel-panel{position:absolute;}
+.map-main-frame{top:146px;}
+.map-thumb-strip{top:792px;}
+.map-intel-panel{top:1018px;}
+.map-zone-hotspot span{font-weight:700;letter-spacing:.1em;}
+.map-pin{filter:blur(.25px);}
+@media (max-width:520px){.route-loader-panel{width:260px}.route-loader-title{font-size:20px}}
+
+
+/* ASTRA v10 layered map builder/rendering */
+.map-image-host{position:absolute;inset:0;overflow:hidden;z-index:1;}
+.map-layer-canvas{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;}
+.map-layer-img{position:absolute;display:block;object-fit:contain;transform-origin:center center;pointer-events:none;filter:drop-shadow(0 0 12px rgba(46,220,255,.2));}
+.map-layer-background{object-fit:fill;filter:none;}
+.map-hotspot-layer,.map-pin-layer{position:absolute;inset:0;z-index:10;pointer-events:none;}
+.map-hotspot-layer .map-zone-hotspot,.map-pin-layer .map-pin{pointer-events:auto;}
+
+/* ASTRA v13: map menu font lock + softened back button glow */
+:root{
+  --astra-font:'Orbitron','Rajdhani','Eurostile','Bank Gothic','Arial Narrow',Arial,sans-serif;
+}
+.page-map .map-terminal,
+.page-map .map-terminal *,
+.map-terminal,
+.map-terminal *{
+  font-family:var(--astra-font)!important;
+  text-transform:uppercase!important;
+  letter-spacing:.095em!important;
+  font-weight:600!important;
+}
+.map-kicker,
+.map-title,
+.map-summary,
+.map-thumb span,
+.map-intel-label,
+.map-intel-title,
+.map-intel-body,
+.map-zone-hotspot span{
+  font-family:var(--astra-font)!important;
+}
+.map-title{
+  font-weight:700!important;
+  letter-spacing:.105em!important;
+}
+.map-summary,
+.map-intel-body{
+  font-weight:500!important;
+  letter-spacing:.075em!important;
+}
+.back-button-glow{
+  filter:drop-shadow(0 0 6px rgba(46,220,255,.42)) drop-shadow(0 0 14px rgba(46,220,255,.20))!important;
+}
+.back-button-glow::before{
+  opacity:.28!important;
+  inset:18px 92px 14px 28px!important;
+  background:radial-gradient(ellipse at 28% 50%,rgba(46,220,255,.20),rgba(46,220,255,.07) 46%,rgba(46,220,255,0) 78%)!important;
+  box-shadow:0 0 12px rgba(46,220,255,.18)!important;
+  animation:none!important;
+}
+@keyframes backButtonBlueGlow{
+  0%,100%{opacity:.28;filter:blur(.2px);}
+  50%{opacity:.34;filter:blur(.6px);}
+}
+
+/* ASTRA v14: map pin coordinate lock
+   The map editor uses a 360×220 coordinate canvas. The live app now uses the same
+   centred coordinate canvas inside the visible map frame, so pins, hotspots and
+   layered map images cannot drift when the UI frame is taller or resized. */
+.map-main-frame{
+  overflow:hidden!important;
+}
+.map-coordinate-stage{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:100%;
+  aspect-ratio:360 / 220;
+  max-height:100%;
+  transform:translate(-50%,-50%);
+  transform-origin:center center;
+  overflow:hidden;
+  z-index:1;
+}
+.map-coordinate-stage .map-image-host,
+.map-coordinate-stage .map-hotspot-layer,
+.map-coordinate-stage .map-pin-layer{
+  position:absolute!important;
+  inset:0!important;
+}
+.map-coordinate-stage .map-layer-canvas{
+  position:absolute!important;
+  inset:0!important;
+}
+
+/* ASTRA v18: red anomaly map pins with soft blue outer fade */
+.map-pin{
+  width:50px;
+  height:50px;
+  margin-left:-25px;
+  margin-top:-25px;
+  border:0!important;
+  background:radial-gradient(circle,
+    rgba(255,255,255,.98) 0 7%,
+    rgba(255,82,82,1) 13% 27%,
+    rgba(255,64,64,.74) 34%,
+    rgba(255,64,64,.18) 44%,
+    rgba(46,220,255,.26) 58%,
+    rgba(46,220,255,0) 78%)!important;
+  box-shadow:
+    0 0 14px rgba(255,72,72,.96),
+    0 0 30px rgba(255,72,72,.52),
+    0 0 54px rgba(46,220,255,.24)!important;
+  animation:mapPinRedBluePulse 1.45s ease-in-out infinite!important;
+  filter:none!important;
+}
+.map-pin::after{
+  inset:-18px!important;
+  border:0!important;
+  background:radial-gradient(circle,
+    rgba(255,255,255,0) 34%,
+    rgba(46,220,255,.30) 49%,
+    rgba(46,220,255,.10) 61%,
+    rgba(255,255,255,0) 74%)!important;
+  box-shadow:0 0 24px rgba(46,220,255,.24)!important;
+  animation:mapPinBlueHalo 1.45s ease-out infinite!important;
+}
+.map-pin.is-active{
+  transform:scale(1.12)!important;
+  box-shadow:
+    0 0 18px rgba(255,84,84,1),
+    0 0 34px rgba(255,84,84,.66),
+    0 0 62px rgba(46,220,255,.34)!important;
+}
+.map-pin.is-logged{
+  opacity:1!important;
+}
+@keyframes mapPinRedBluePulse{
+  0%,100%{
+    opacity:.72;
+    transform:scale(.90);
+    filter:brightness(.96);
+  }
+  52%{
+    opacity:1;
+    transform:scale(1.06);
+    filter:brightness(1.22);
+  }
+}
+@keyframes mapPinBlueHalo{
+  0%{
+    opacity:.48;
+    transform:scale(.70);
+  }
+  100%{
+    opacity:0;
+    transform:scale(1.58);
+  }
+}
+
+/* ASTRA v19: overview zone clickable-box transform lock */
+.map-hotspot-transform-layer{
+  position:absolute;
+  transform-origin:center center;
+  pointer-events:none;
+  z-index:12;
+}
+.map-hotspot-transform-layer .map-zone-hotspot{
+  pointer-events:auto;
+}

@@ -1,0 +1,11 @@
+ASTRA v8 UI layout editor update
+
+Changes:
+- The map page UI panel layout is now editable through map-editor.html in the working ZIP.
+- Map UI layout values live in data/map-config.js under window.ASTRA_MAP_UI_LAYOUT_CONFIG.
+- Default map terminal has been moved lower on the screen.
+- Loader text now says LOADING.
+- Loader is a smaller in-terminal style overlay instead of a full-screen blackout.
+- Background UI, Roll Britannia logo, and back button are treated as instant/critical UI layers.
+- The editor now has a Screen UI Layout mode for dragging the map page boxes, plus the existing Map Pins + Zone Boxes mode.
+- Public ZIP does not include QR folders or printable scan target images.

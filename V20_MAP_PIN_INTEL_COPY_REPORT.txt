@@ -1,0 +1,14 @@
+ASTRA v20 map pin intel copy update
+
+Changed the text shown when a user taps a map pin.
+
+Before anomaly scan:
+- Title: UNKNOWN ANOMALY
+- Body: UNKNOWN ANOMALY LOCATED AT THESE COORDINATES, followed by the configured coordinates/location text.
+
+After anomaly scan:
+- Title: ANOMALY DISCOVERED
+- Body: anomaly name, coordinates/location text, and SEE DATA LOG FOR MORE DETAILS.
+
+Removed the previous CLASSIFICATION LOCKED UNTIL SCAN wording from map pin intel.
+Bumped the asset/cache version so the updated text logic loads cleanly.

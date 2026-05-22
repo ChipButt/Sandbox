@@ -1,0 +1,11 @@
+ASTRA v7 map UI + loading update
+
+Changes included:
+- Map overview clickable zone boxes are visible, softer, and editable in map-editor.html.
+- Map text now uses the shared ASTRA-style font stack in the app CSS.
+- Map title, kicker, summary, default intel heading/body, pin text and zone box labels are editable through data/map-config.js.
+- Pins now use softer fading light pulses instead of hard blinking outlines.
+- Page navigation now shows a lightweight RECEIVING ASTRA DATA loading screen until page assets are ready.
+- App assets are preloaded on boot to reduce first-open blank UI loading.
+- Back button layers have a stronger blue glow/backlight.
+- QR folders and printable scan targets are still not included in the public deploy version.

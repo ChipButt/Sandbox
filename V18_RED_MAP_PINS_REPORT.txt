@@ -1,0 +1,5 @@
+ASTRA v18 map pin visual update
+
+Changed the map-screen anomaly pins to a red blinking core with a soft blue outer fade/halo.
+Updated styles.css with final override rules for .map-pin and .map-pin::after.
+Bumped asset/cache version so the new CSS loads cleanly.

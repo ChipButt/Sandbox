@@ -1,0 +1,10 @@
+ASTRA v21 black screen fix
+
+Cause:
+- v20 introduced a JavaScript syntax error in app.js.
+- The join newline string was written across two literal lines inside single quotes, causing the whole app script to fail and display a black screen.
+
+Fix:
+- Corrected the newline join string to use an escaped newline.
+- Ran node --check app.js successfully.
+- Kept the v20 map pin intel text changes.

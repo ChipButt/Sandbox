@@ -1,0 +1,10 @@
+ASTRA v19 overview zone hotspot alignment fix
+
+Problem addressed:
+- The clickable zone boxes on the planet overview could visually drift away from the represented overview map section.
+
+Fix:
+- Overview zone hotspot boxes now render inside a transform layer anchored to the overview coloured map overlay.
+- This means the clickable boxes follow the same x/y/width/height/rotation as the visible overview map overlay.
+- The existing hotspot values from data/map-config.js are still used as the source positions.
+- Cache version was bumped so GitHub/browser should load the updated JS/CSS.

@@ -1,0 +1,7 @@
+ASTRA v17 header position update
+
+Updated data/header-config.js with the supplied coordinates:
+- Roll Britannia logo: x=55, y=45, width=200, height=80
+- UI back button: x=767, y=37, width=290, height=97
+
+The app applies this global config to every screen where these assets appear.

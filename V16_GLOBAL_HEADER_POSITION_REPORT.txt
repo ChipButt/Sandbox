@@ -1,0 +1,9 @@
+ASTRA v16 global header position system
+
+Added data/header-config.js containing global positions for:
+- Roll Britannia logo
+- Background UI back button
+
+App.js now applies those coordinates to every layout layer using assets/rb-logo.webp or assets/background-ui-back-button.webp.
+The working build includes header-position-editor.html for dragging/resizing these two assets on a home-screen-style preview.
+Exported header-config.js can be uploaded alone to update the public app without rebuilding.
