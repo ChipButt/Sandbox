@@ -1,0 +1,26 @@
+[
+  {
+    "marker": "ASTRA:UKGE:ANOMALY-01",
+    "triggers": "next unscanned anomaly"
+  },
+  {
+    "marker": "ASTRA:UKGE:ANOMALY-02",
+    "triggers": "next unscanned anomaly"
+  },
+  {
+    "marker": "ASTRA:UKGE:ANOMALY-03",
+    "triggers": "next unscanned anomaly"
+  },
+  {
+    "marker": "ASTRA:UKGE:ANOMALY-04",
+    "triggers": "next unscanned anomaly"
+  },
+  {
+    "marker": "ASTRA:UKGE:ANOMALY-05",
+    "triggers": "next unscanned anomaly"
+  },
+  {
+    "marker": "ASTRA:UKGE:ANOMALY-06",
+    "triggers": "next unscanned anomaly"
+  }
+]
