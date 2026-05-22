@@ -1,0 +1,19 @@
+ASTRA Custom Visual Scanner v3 - Image Lock Fix
+
+Reason for rebuild:
+- v2 was too strict and too dependent on a centred, perfect full-frame image.
+- The printable targets also had too much empty black space, making real camera scanning from a screen/poster unreliable.
+
+Changes in v3:
+- Rebuilt the six printable anomaly targets so the anomaly fills the frame more closely.
+- Added small integrated ASTRA constellation glyphs. They are not QR codes or barcodes and should look like anomaly detail, but they give the scanner a real repeatable pattern to lock onto.
+- Scanner now detects object/content regions in the camera frame before comparing pattern fingerprints.
+- Scanner now compares against multiple camera/screen variants of each target.
+- Scanner requires two matching frames before unlocking.
+- QR fallback is still present.
+- Colour-only triggering remains removed.
+
+Test guidance:
+- Display or print the v3 target images, not the older v1/v2 target images.
+- Hold the target so the anomaly image fills roughly half to most of the scanner view.
+- Avoid glare/reflections if scanning from a monitor.

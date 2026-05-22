@@ -1,0 +1,24 @@
+ASTRA CUSTOM VISUAL SCANNER V4 — MAPPING FIX
+
+This update keeps the v3 scan-target images and scanner behaviour, but fixes the anomaly marker mapping.
+
+Correct locked mapping:
+01 / ASTRA:UKGE:ANOMALY-01 -> TRACKWAY IMPRESSION
+02 / ASTRA:UKGE:ANOMALY-02 -> SPORE-CROWN BLOOM
+03 / ASTRA:UKGE:ANOMALY-03 -> RESONANT LIQUID BASIN
+04 / ASTRA:UKGE:ANOMALY-04 -> PRESSURE GAS VENT
+05 / ASTRA:UKGE:ANOMALY-05 -> LUMINOUS SAP STUMP
+06 / ASTRA:UKGE:ANOMALY-06 -> EMBERHEART GEODE
+
+Reason for the fix:
+The visual scan target signatures were already numbered correctly, but the app content file had anomaly 03/04/05/06 assigned to the wrong marker payloads.
+That meant the scan target worked, but the displayed anomaly was shifted to the wrong entry.
+
+Files changed:
+- data/content.js
+- app.js embedded fallback content
+- qr-codes/qr-payloads.json
+- qr-codes/qr-payloads.txt
+- index.html version cache-bust strings
+
+Target images were not visually changed.

@@ -1,0 +1,7 @@
+ASTRA Field Terminal - GitHub Size Fix
+
+- Compressed the six animated WebP anomaly loops for GitHub upload.
+- Preserved animated WebP format and frame-based movement.
+- Kept app-level anomaly animation disabled so only the WebP loop animation plays.
+- Kept the anomaly title centering fixes.
+- Bumped app cache version to 20260521-animated-loops-github-v3.

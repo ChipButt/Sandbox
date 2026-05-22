@@ -1,0 +1,13 @@
+ASTRA v5 public deployment build
+
+This build removes:
+- qr-codes/ printable QR files
+- assets/printable-anomaly-scan-targets/ printable scan target image files
+- data/visual-marker-signatures.json duplicate signature file
+
+The app still contains the embedded visual-marker fingerprints inside app.js because the in-browser scanner needs those to recognise the printed anomaly images.
+
+QR fallback has been disabled in app.js for this public build. The scanner now uses the custom anomaly-image recognition path only.
+
+Security note:
+This is still a static GitHub Pages style app. Anything in the client files can be inspected by a determined person. This build avoids publishing the actual printable images and QR files, but it cannot provide true anti-cheat security without server-side validation.
