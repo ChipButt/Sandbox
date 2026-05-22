@@ -1,0 +1,1 @@
+Map configuration updated from uploaded Pasted text.txt. Only data/map-config.js was replaced. Main app code, scanner code, assets, and public/working folder structure were otherwise left unchanged.
