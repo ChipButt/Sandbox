@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title">
+  <title>Compass</title>
+  <circle cx="80" cy="80" r="70" fill="#102c40" stroke="#d8a24b" stroke-width="8"/>
+  <circle cx="80" cy="80" r="49" fill="#f1d39a" stroke="#70421e" stroke-width="5"/>
+  <path d="M80 19l13 48 48 13-48 13-13 48-13-48-48-13 48-13z" fill="#b8322c"/>
+  <path d="M80 31l-13 36-36 13 36 13 13 36 13-36 36-13-36-13z" fill="#11354c"/>
+  <circle cx="80" cy="80" r="8" fill="#f7de9e"/>
+</svg>

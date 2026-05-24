@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 190" role="img" aria-labelledby="title">
+  <title>Case file</title>
+  <path d="M25 53c0-13 10-23 23-23h55l18 22h91c13 0 23 10 23 23v79c0 13-10 23-23 23H48c-13 0-23-10-23-23z" fill="#c9914b" stroke="#5d351a" stroke-width="8"/>
+  <path d="M25 76h210v78c0 13-10 23-23 23H48c-13 0-23-10-23-23z" fill="#efcf8f"/>
+  <path d="M67 105h126M67 128h92" stroke="#6a411f" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="190" cy="126" r="25" fill="#9f241f"/>
+  <path d="M177 126l9 9 18-23" fill="none" stroke="#f8d9ae" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 420" role="img" aria-labelledby="title">
+  <title>Scanner frame</title>
+  <rect x="16" y="16" width="288" height="388" rx="36" fill="none" stroke="#d8a24b" stroke-width="8" stroke-dasharray="48 18"/>
+  <path d="M55 84V55h47M218 55h47v29M55 336v29h47M265 336v29h-47" fill="none" stroke="#f7d479" stroke-width="11" stroke-linecap="round"/>
+  <path d="M64 210h192" stroke="#d33f2f" stroke-width="5" stroke-linecap="round" opacity=".85"/>
+</svg>

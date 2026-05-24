@@ -1,0 +1,20 @@
+{
+  "name": "Captain's Trail: Bidford-on-Avon",
+  "short_name": "Captain's Trail",
+  "description": "A static pirate treasure trail around Bidford-on-Avon.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#071827",
+  "theme_color": "#071827",
+  "icons": [
+    {
+      "src": "assets/generated/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["games", "travel", "navigation"]
+}

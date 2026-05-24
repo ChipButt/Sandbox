@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title>Captain's Trail App Icon</title>
+  <defs>
+    <linearGradient id="sea" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#102f44"/>
+      <stop offset="1" stop-color="#05111e"/>
+    </linearGradient>
+    <radialGradient id="gold" cx="48%" cy="38%" r="55%">
+      <stop offset="0" stop-color="#ffe8a0"/>
+      <stop offset=".55" stop-color="#d69a31"/>
+      <stop offset="1" stop-color="#7d4618"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#sea)"/>
+  <circle cx="256" cy="256" r="174" fill="#0b1d2b" stroke="#e0aa4c" stroke-width="18"/>
+  <circle cx="256" cy="256" r="132" fill="url(#gold)" stroke="#5b3115" stroke-width="12"/>
+  <path d="M256 112l22 96 96 22-96 22-22 96-22-96-96-22 96-22z" fill="#071827" opacity=".92"/>
+  <path d="M198 338c24 26 92 26 116 0 18 20 27 42 27 61H171c0-19 9-41 27-61z" fill="#071827"/>
+  <path d="M211 323c0-34 20-58 45-58s45 24 45 58c0 23-90 23-90 0z" fill="#071827"/>
+  <circle cx="224" cy="317" r="11" fill="#f7d47a"/>
+  <circle cx="288" cy="317" r="11" fill="#f7d47a"/>
+</svg>

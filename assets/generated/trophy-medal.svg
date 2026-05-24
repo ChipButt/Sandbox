@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 220" role="img" aria-labelledby="title">
+  <title>Trophy medal</title>
+  <path d="M54 6h72l-20 78H74z" fill="#be3430"/>
+  <path d="M24 6h50l16 78H58zM106 6h50l-34 78H90z" fill="#123248"/>
+  <circle cx="90" cy="135" r="70" fill="#d99a38" stroke="#6c3b19" stroke-width="8"/>
+  <circle cx="90" cy="135" r="48" fill="#f4ce70"/>
+  <path d="M90 87l11 34 36 1-29 20 10 35-28-21-28 21 10-35-29-20 36-1z" fill="#7a421a"/>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 150" role="img" aria-labelledby="title">
+  <title>Eliminated stamp</title>
+  <path d="M34 48c13-25 35-15 48-31 16-19 37 8 57 4 30-5 40 15 42 38 2 24 27 33 9 59-15 23-44 6-65 19-24 16-39-9-59-6-28 5-44-18-38-42 3-13-4-25 6-41z" fill="#9f241f" opacity=".96"/>
+  <g transform="rotate(-11 110 75)">
+    <rect x="33" y="42" width="154" height="58" rx="7" fill="none" stroke="#f4cab0" stroke-width="6"/>
+    <text x="110" y="80" text-anchor="middle" font-family="Georgia, serif" font-size="28" font-weight="700" fill="#f4cab0">ELIMINATED</text>
+  </g>
+</svg>

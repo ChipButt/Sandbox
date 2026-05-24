@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#071827">
+    <meta name="description" content="Captain's Trail: Bidford-on-Avon, a pirate treasure hunt around Bidford-on-Avon.">
+    <title>Captain&rsquo;s Trail: Bidford-on-Avon</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="assets/generated/app-icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="assets/generated/app-icon.svg">
+    <link rel="stylesheet" href="styles.css">
+    <script src="data/trails.js" defer></script>
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div id="splash" class="splash" aria-live="polite">
+      <div class="splash__emblem">
+        <img src="assets/generated/logo.svg" alt="Captain's Trail logo">
+      </div>
+      <h1>Captain&rsquo;s Trail</h1>
+      <p>Bidford-on-Avon</p>
+      <div class="loader" aria-label="Loading">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+
+    <div id="app" class="app-shell" aria-live="polite"></div>
+
+    <noscript>
+      <main class="noscript-card">
+        <h1>Captain&rsquo;s Trail needs JavaScript</h1>
+        <p>This treasure trail runs entirely in your browser and needs JavaScript to save progress, check location, and use the camera scanner.</p>
+      </main>
+    </noscript>
+  </body>
+</html>

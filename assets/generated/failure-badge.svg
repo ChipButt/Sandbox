@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title">
+  <title>Failure badge</title>
+  <circle cx="80" cy="80" r="70" fill="#8b2824" stroke="#e7bd5b" stroke-width="8"/>
+  <path d="M52 52l56 56M108 52l-56 56" stroke="#fff0bd" stroke-width="13" stroke-linecap="round"/>
+</svg>

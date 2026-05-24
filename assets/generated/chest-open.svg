@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 220" role="img" aria-labelledby="title">
+  <title>Open treasure chest</title>
+  <defs>
+    <linearGradient id="openWood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a9612d"/>
+      <stop offset="1" stop-color="#4c2416"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff5bd"/>
+      <stop offset=".45" stop-color="#f2b945"/>
+      <stop offset="1" stop-color="#9c551d"/>
+    </linearGradient>
+  </defs>
+  <path d="M56 81c23-58 94-79 150-38l22 48-150 38z" fill="url(#openWood)" stroke="#2a160e" stroke-width="8"/>
+  <path d="M48 111h184v78H48z" fill="url(#openWood)" stroke="#2a160e" stroke-width="8"/>
+  <path d="M78 115c22-20 42-20 62 0 21-20 42-20 64 0" fill="none" stroke="url(#shine)" stroke-width="20" stroke-linecap="round"/>
+  <path d="M90 41l17 31M129 31l1 35M168 38l-16 31" stroke="#ffe7a1" stroke-width="8" stroke-linecap="round"/>
+  <path d="M48 132h184M92 55l-13 126M202 50l-10 131" stroke="#d4983a" stroke-width="12"/>
+  <rect x="115" y="119" width="50" height="44" rx="6" fill="url(#shine)" stroke="#5a3518" stroke-width="6"/>
+</svg>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title">
+  <title>Settings</title>
+  <circle cx="80" cy="80" r="67" fill="#102c40" stroke="#d8a24b" stroke-width="8"/>
+  <path d="M80 36l11 9 14-3 8 14-6 13 6 11-8 14-14-3-11 9-11-9-14 3-8-14 6-11-6-13 8-14 14 3z" fill="#f0c866" stroke="#673a19" stroke-width="6"/>
+  <circle cx="80" cy="68" r="15" fill="#102c40"/>
+</svg>
