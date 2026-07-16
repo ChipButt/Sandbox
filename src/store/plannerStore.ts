@@ -10,6 +10,7 @@ import type {
   PlanufProject,
   Point,
   RoomAreaId,
+  RoomTemplate,
   ViewState,
 } from "../types/project";
 import { createId } from "../utils/id";
@@ -24,6 +25,12 @@ import {
   DEFAULT_LAYER_ID,
   touchProject,
 } from "../utils/projectFactory";
+import {
+  createProjectFromRoomTemplate,
+  createRoomTemplateFromProject,
+  persistRoomTemplates,
+  readRoomTemplates,
+} from "../utils/roomTemplates";
 import { scaleLabelForCanvas, snapRoomToGrid } from "../utils/scale";
 import { createProjectFromTemplate } from "../utils/templates";
 
@@ -39,6 +46,7 @@ interface PlannerStore {
   project: PlanufProject;
   selectedIds: string[];
   selectedRoomArea: RoomAreaId | null;
+  roomTemplates: RoomTemplate[];
   activeLayerId: string;
   activeTool: "select" | "pan" | MeasurementKind;
   view: ViewState;
@@ -83,6 +91,8 @@ interface PlannerStore {
   setActiveLayer: (id: string) => void;
   createPresetFromSelection: () => void;
   deletePreset: (id: string) => void;
+  saveCurrentRoomTemplate: (name: string) => void;
+  deleteRoomTemplate: (id: string) => void;
   undo: () => void;
   redo: () => void;
   markAutosaved: () => void;
@@ -198,6 +208,7 @@ export const usePlannerStore = create<PlannerStore>((set, get) => ({
   project: createBlankProject(),
   selectedIds: [],
   selectedRoomArea: null,
+  roomTemplates: readRoomTemplates(),
   activeLayerId: DEFAULT_LAYER_ID,
   activeTool: "select",
   view: { x: 48, y: 48, scale: 0.32 },
@@ -208,7 +219,10 @@ export const usePlannerStore = create<PlannerStore>((set, get) => ({
   history: { past: [], future: [] },
 
   newProject: (templateId) => {
-    const project = normaliseProject(templateId ? createProjectFromTemplate(templateId) : createBlankProject());
+    const roomTemplate = templateId ? get().roomTemplates.find((template) => template.id === templateId) : undefined;
+    const project = normaliseProject(
+      roomTemplate ? createProjectFromRoomTemplate(roomTemplate) : templateId ? createProjectFromTemplate(templateId) : createBlankProject(),
+    );
     set((state) => ({
       project,
       selectedIds: [],
@@ -561,6 +575,28 @@ export const usePlannerStore = create<PlannerStore>((set, get) => ({
         "Deleted preset",
       ),
     );
+  },
+
+  saveCurrentRoomTemplate: (name) => {
+    const state = get();
+    const template = createRoomTemplateFromProject(state.project, name);
+    const templates = [template, ...state.roomTemplates];
+    persistRoomTemplates(templates);
+    set({
+      roomTemplates: templates,
+      status: `Saved ${template.name} room template`,
+    });
+  },
+
+  deleteRoomTemplate: (id) => {
+    const state = get();
+    const template = state.roomTemplates.find((item) => item.id === id);
+    const templates = state.roomTemplates.filter((item) => item.id !== id);
+    persistRoomTemplates(templates);
+    set({
+      roomTemplates: templates,
+      status: template ? `Deleted ${template.name} room template` : "Deleted room template",
+    });
   },
 
   undo: () => {

@@ -249,3 +249,14 @@ export interface ProjectTemplate {
   canvas: Partial<CanvasSettings>;
   objects: PlanObject[];
 }
+
+export interface RoomTemplate {
+  id: string;
+  name: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+  canvas: CanvasSettings;
+  layers: LayerDefinition[];
+  objects: PlanObject[];
+}

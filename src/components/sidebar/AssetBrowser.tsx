@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { MousePointer2, Ruler, Search } from "lucide-react";
+import { MousePointer2, Ruler, Save, Search, Trash2 } from "lucide-react";
 import type { ActiveTool, AssetCategory } from "../../types/project";
 import { ASSET_CATEGORIES, ASSETS } from "../../utils/assets";
 import { TEMPLATE_SUMMARIES } from "../../utils/templates";
@@ -21,7 +21,11 @@ export function AssetBrowser() {
   const activeTool = usePlannerStore((state) => state.activeTool);
   const setActiveTool = usePlannerStore((state) => state.setActiveTool);
   const newProject = usePlannerStore((state) => state.newProject);
+  const roomTemplates = usePlannerStore((state) => state.roomTemplates);
+  const saveCurrentRoomTemplate = usePlannerStore((state) => state.saveCurrentRoomTemplate);
+  const deleteRoomTemplate = usePlannerStore((state) => state.deleteRoomTemplate);
   const addObjectFromAsset = usePlannerStore((state) => state.addObjectFromAsset);
+  const projectName = usePlannerStore((state) => state.project.metadata.name);
   const canvas = usePlannerStore((state) => state.project.canvas);
   const view = usePlannerStore((state) => state.view);
 
@@ -47,6 +51,13 @@ export function AssetBrowser() {
       x: clamp(world.x, 0, canvas.width),
       y: clamp(world.y, 0, canvas.height),
     });
+  };
+  const saveTemplate = (): void => {
+    const name = window.prompt("Room template name", projectName);
+    if (name === null) {
+      return;
+    }
+    saveCurrentRoomTemplate(name);
   };
 
   return (
@@ -121,6 +132,45 @@ export function AssetBrowser() {
 
       <PanelSection title="Templates">
         <div className="grid gap-2">
+          <button className={`${buttonClassName} justify-start`} type="button" onClick={saveTemplate}>
+            <Save className="h-3.5 w-3.5" />
+            Save Current Room Template
+          </button>
+          {roomTemplates.length > 0 ? (
+            <div className="grid gap-2 border-b border-black/10 pb-2">
+              {roomTemplates.map((template) => (
+                <div className="rounded border border-black/10 bg-white p-2 shadow-sm" key={template.id}>
+                  <button
+                    className="block w-full text-left"
+                    type="button"
+                    onClick={() => {
+                      if (window.confirm(`Create a new project from "${template.name}"? Unsaved changes stay in autosave until cleared.`)) {
+                        newProject(template.id);
+                      }
+                    }}
+                  >
+                    <span className="block truncate text-[12px] font-semibold text-ink-900">{template.name}</span>
+                    <span className="mt-0.5 block truncate text-[11px] text-ink-500">{template.description}</span>
+                  </button>
+                  <div className="mt-2 flex items-center justify-between gap-2 text-[11px] text-ink-500">
+                    <span>{new Date(template.updatedAt).toLocaleDateString()}</span>
+                    <button
+                      className="inline-flex h-6 w-6 items-center justify-center rounded text-signal-red hover:bg-red-50"
+                      title={`Delete ${template.name}`}
+                      type="button"
+                      onClick={() => {
+                        if (window.confirm(`Delete "${template.name}" room template?`)) {
+                          deleteRoomTemplate(template.id);
+                        }
+                      }}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : null}
           {TEMPLATE_SUMMARIES.map((template) => (
             <button
               className="rounded border border-black/10 bg-white p-2 text-left shadow-sm transition hover:border-signal-blue hover:bg-blue-50"
