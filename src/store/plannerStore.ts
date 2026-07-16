@@ -104,16 +104,22 @@ function cloneProject(project: PlanufProject): PlanufProject {
 }
 
 function mergeCanvasSettings(current: CanvasSettings, settings: Partial<CanvasSettings>): CanvasSettings {
+  const roomPatch: Partial<CanvasSettings["room"]> = settings.room ?? {};
+  const shouldMigrateLegacySplit =
+    settings.room !== undefined &&
+    !("performanceArea" in roomPatch) &&
+    current.room.performanceArea === null &&
+    roomPatch.areaMode !== undefined &&
+    roomPatch.areaMode !== "none";
+  const room = {
+    ...current.room,
+    ...roomPatch,
+    ...(shouldMigrateLegacySplit ? { performanceArea: undefined } : {}),
+  } as CanvasSettings["room"];
   const next: CanvasSettings = {
     ...current,
     ...settings,
-    room: snapRoomToGrid(
-      {
-        ...current.room,
-        ...(settings.room ?? {}),
-      },
-      settings.gridSize ?? current.gridSize,
-    ),
+    room: snapRoomToGrid(room, settings.gridSize ?? current.gridSize),
   };
 
   return {

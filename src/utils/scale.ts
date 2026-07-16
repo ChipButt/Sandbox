@@ -69,29 +69,124 @@ export function normalisedRoomDisplaySize(value: number): number {
   return Math.max(MIN_ROOM_UNITS, roundForDisplay(value));
 }
 
-export function roomAreaBounds(room: RoomSettings, area: RoomAreaId): RectBounds {
+function snapValue(value: number, gridSize: number): number {
+  return Math.round(value / gridSize) * gridSize;
+}
+
+function legacyPerformanceArea(room: RoomSettings): RectBounds | null {
   if (room.areaMode === "horizontal") {
-    const performanceHeight = room.height * room.splitRatio;
-    return area === "performance"
-      ? { x: room.x, y: room.y, width: room.width, height: performanceHeight }
-      : { x: room.x, y: room.y + performanceHeight, width: room.width, height: room.height - performanceHeight };
+    return {
+      x: 0,
+      y: 0,
+      width: room.width,
+      height: room.height * room.splitRatio,
+    };
   }
 
-  const performanceWidth = room.width * room.splitRatio;
-  return area === "performance"
-    ? { x: room.x, y: room.y, width: performanceWidth, height: room.height }
-    : { x: room.x + performanceWidth, y: room.y, width: room.width - performanceWidth, height: room.height };
+  if (room.areaMode === "vertical") {
+    return {
+      x: 0,
+      y: 0,
+      width: room.width * room.splitRatio,
+      height: room.height,
+    };
+  }
+
+  return null;
+}
+
+export function createDefaultPerformanceArea(room: RoomSettings): RectBounds {
+  const width = room.width * 0.48;
+  const height = room.height * 0.58;
+
+  return {
+    x: (room.width - width) / 2,
+    y: (room.height - height) / 2,
+    width,
+    height,
+  };
+}
+
+export function normalisePerformanceArea(room: RoomSettings, gridSize: number): RectBounds | null {
+  const safeGridSize = Math.max(1, gridSize);
+  const source = room.performanceArea === undefined ? legacyPerformanceArea(room) : room.performanceArea;
+
+  if (!source) {
+    return null;
+  }
+
+  const maxWidth = Math.max(safeGridSize, room.width);
+  const maxHeight = Math.max(safeGridSize, room.height);
+  const width = clamp(snapValue(source.width, safeGridSize), safeGridSize, maxWidth);
+  const height = clamp(snapValue(source.height, safeGridSize), safeGridSize, maxHeight);
+  const x = clamp(snapValue(source.x, safeGridSize), 0, Math.max(0, room.width - width));
+  const y = clamp(snapValue(source.y, safeGridSize), 0, Math.max(0, room.height - height));
+
+  return { x, y, width, height };
+}
+
+export function roomAreaBounds(room: RoomSettings, area: RoomAreaId): RectBounds {
+  if (area === "crew") {
+    return { x: room.x, y: room.y, width: room.width, height: room.height };
+  }
+
+  const performanceArea = room.performanceArea;
+  return performanceArea
+    ? {
+        x: room.x + performanceArea.x,
+        y: room.y + performanceArea.y,
+        width: performanceArea.width,
+        height: performanceArea.height,
+      }
+    : { x: room.x, y: room.y, width: 0, height: 0 };
+}
+
+export function roomWithAreaBounds(room: RoomSettings, area: RoomAreaId, bounds: RectBounds, gridSize: number): RoomSettings {
+  const safeGridSize = Math.max(1, gridSize);
+
+  if (area === "crew") {
+    return snapRoomToGrid(
+      {
+        ...room,
+        x: bounds.x,
+        y: bounds.y,
+        width: bounds.width,
+        height: bounds.height,
+      },
+      safeGridSize,
+    );
+  }
+
+  return snapRoomToGrid(
+    {
+      ...room,
+      areaMode: "vertical",
+      performanceArea: {
+        x: bounds.x - room.x,
+        y: bounds.y - room.y,
+        width: bounds.width,
+        height: bounds.height,
+      },
+    },
+    safeGridSize,
+  );
 }
 
 export function snapRoomToGrid(room: RoomSettings, gridSize: number): RoomSettings {
   const safeGridSize = Math.max(1, gridSize);
+  const snappedRoom = {
+    ...room,
+    x: snapValue(room.x, safeGridSize),
+    y: snapValue(room.y, safeGridSize),
+    width: Math.max(safeGridSize, snapValue(room.width, safeGridSize)),
+    height: Math.max(safeGridSize, snapValue(room.height, safeGridSize)),
+    splitRatio: clamp(room.splitRatio, 0.05, 0.95),
+  };
+  const performanceArea = normalisePerformanceArea(snappedRoom, safeGridSize);
 
   return {
-    ...room,
-    x: Math.round(room.x / safeGridSize) * safeGridSize,
-    y: Math.round(room.y / safeGridSize) * safeGridSize,
-    width: Math.max(safeGridSize, room.width),
-    height: Math.max(safeGridSize, room.height),
-    splitRatio: clamp(room.splitRatio, 0.05, 0.95),
+    ...snappedRoom,
+    areaMode: performanceArea ? (snappedRoom.areaMode === "none" ? "vertical" : snappedRoom.areaMode) : "none",
+    performanceArea,
   };
 }

@@ -60,6 +60,7 @@ export interface RoomSettings extends RectBounds {
   visible: boolean;
   areaMode: RoomAreaMode;
   splitRatio: number;
+  performanceArea: RectBounds | null;
   performanceLabel: string;
   crewLabel: string;
   performanceColor: string;

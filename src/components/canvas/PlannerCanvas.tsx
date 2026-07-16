@@ -6,9 +6,10 @@ import type { MutableRefObject } from "react";
 import type { MeasurementKind, PlanObject, Point, RectBounds, RoomAreaId, ViewState } from "../../types/project";
 import { ASSET_MAP } from "../../utils/assets";
 import { clamp, computeSnap, fitCanvasView, normalizeRect, objectBounds, rectsIntersect, screenToWorld } from "../../utils/geometry";
+import { roomAreaBounds, roomWithAreaBounds } from "../../utils/scale";
 import { useElementSize } from "../../hooks/useElementSize";
 import { usePlannerStore } from "../../store/plannerStore";
-import { GridLayer } from "./GridLayer";
+import { GridLayer, type RoomAreaResizeHandle } from "./GridLayer";
 import { GuidesLayer } from "./GuidesLayer";
 import { ObjectNode } from "./ObjectNode";
 
@@ -34,9 +35,19 @@ interface PendingRoomAreaSelection {
   start: Point;
 }
 
+interface RoomAreaResizeSession {
+  area: RoomAreaId;
+  handle: RoomAreaResizeHandle;
+  startBounds: RectBounds;
+}
+
 function isStageBackground(target: Konva.Node): boolean {
   const targetName = target.name();
   return target === target.getStage() || targetName.includes("canvas-background") || targetName.includes("room-area-");
+}
+
+function isRoomAreaHandle(target: Konva.Node): boolean {
+  return target.name().includes("room-area-handle");
 }
 
 function roomAreaFromTarget(target: Konva.Node): RoomAreaId | null {
@@ -100,17 +111,59 @@ function objectLayerLocked(object: PlanObject, layerMap: Map<string, { locked: b
   return layerMap.get(object.layerId)?.locked ?? false;
 }
 
+function snapToGrid(value: number, gridSize: number): number {
+  return Math.round(value / gridSize) * gridSize;
+}
+
+function snapBounds(bounds: RectBounds, gridSize: number): RectBounds {
+  return {
+    x: snapToGrid(bounds.x, gridSize),
+    y: snapToGrid(bounds.y, gridSize),
+    width: Math.max(gridSize, snapToGrid(bounds.width, gridSize)),
+    height: Math.max(gridSize, snapToGrid(bounds.height, gridSize)),
+  };
+}
+
+function clampBounds(bounds: RectBounds, limit: RectBounds, gridSize: number): RectBounds {
+  const snapped = snapBounds(bounds, gridSize);
+  const width = clamp(snapped.width, gridSize, limit.width);
+  const height = clamp(snapped.height, gridSize, limit.height);
+
+  return {
+    x: clamp(snapped.x, limit.x, limit.x + limit.width - width),
+    y: clamp(snapped.y, limit.y, limit.y + limit.height - height),
+    width,
+    height,
+  };
+}
+
+function resizeBounds(startBounds: RectBounds, handle: RoomAreaResizeHandle, point: Point, minSize: number): RectBounds {
+  const left = handle.includes("w") ? Math.min(point.x, startBounds.x + startBounds.width - minSize) : startBounds.x;
+  const top = handle.includes("n") ? Math.min(point.y, startBounds.y + startBounds.height - minSize) : startBounds.y;
+  const right = handle.includes("e") ? Math.max(point.x, startBounds.x + minSize) : startBounds.x + startBounds.width;
+  const bottom = handle.includes("s") ? Math.max(point.y, startBounds.y + minSize) : startBounds.y + startBounds.height;
+
+  return {
+    x: left,
+    y: top,
+    width: right - left,
+    height: bottom - top,
+  };
+}
+
 export function PlannerCanvas({ stageRef }: PlannerCanvasProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const transformerRef = useRef<Konva.Transformer | null>(null);
   const nodeMap = useRef<Map<string, Konva.Group>>(new Map());
   const dragSessionRef = useRef<DragSession | null>(null);
   const panSessionRef = useRef<{ pointer: Point; view: ViewState } | null>(null);
+  const roomAreaResizeSessionRef = useRef<RoomAreaResizeSession | null>(null);
   const touchMovedRef = useRef(false);
   const selectionStartRef = useRef<Point | null>(null);
   const pendingRoomAreaSelectionRef = useRef<PendingRoomAreaSelection | null>(null);
   const hasAutoFitRef = useRef(false);
   const [selectionRect, setSelectionRect] = useState<RectBounds | null>(null);
+  const [draftRoomArea, setDraftRoomArea] = useState<{ area: RoomAreaId; bounds: RectBounds } | null>(null);
   const [draftMeasurement, setDraftMeasurement] = useState<DraftMeasurement | null>(null);
   const size = useElementSize(containerRef);
 
@@ -121,6 +174,7 @@ export function PlannerCanvas({ stageRef }: PlannerCanvasProps) {
   const view = usePlannerStore((state) => state.view);
   const guides = usePlannerStore((state) => state.guides);
   const setView = usePlannerStore((state) => state.setView);
+  const setCanvas = usePlannerStore((state) => state.setCanvas);
   const selectObject = usePlannerStore((state) => state.selectObject);
   const selectRoomArea = usePlannerStore((state) => state.selectRoomArea);
   const setSelection = usePlannerStore((state) => state.setSelection);
@@ -337,6 +391,79 @@ export function PlannerCanvas({ stageRef }: PlannerCanvasProps) {
     }
   }, [updateObject]);
 
+  const clampRoomAreaBounds = useCallback((area: RoomAreaId, bounds: RectBounds): RectBounds => {
+    const state = usePlannerStore.getState();
+    const room = state.project.canvas.room;
+    const gridSize = state.project.canvas.gridSize;
+    const roomBounds = roomAreaBounds(room, "crew");
+
+    if (area === "performance") {
+      return clampBounds(bounds, roomBounds, gridSize);
+    }
+
+    return snapBounds(bounds, gridSize);
+  }, []);
+
+  const commitRoomAreaBounds = useCallback(
+    (area: RoomAreaId, bounds: RectBounds) => {
+      const state = usePlannerStore.getState();
+      const nextRoom = roomWithAreaBounds(state.project.canvas.room, area, clampRoomAreaBounds(area, bounds), state.project.canvas.gridSize);
+      setCanvas({ room: nextRoom });
+      setDraftRoomArea(null);
+      roomAreaResizeSessionRef.current = null;
+    },
+    [clampRoomAreaBounds, setCanvas],
+  );
+
+  const handleRoomAreaDragMove = useCallback(
+    (area: RoomAreaId, bounds: RectBounds) => {
+      setDraftRoomArea({ area, bounds: clampRoomAreaBounds(area, bounds) });
+    },
+    [clampRoomAreaBounds],
+  );
+
+  const handleRoomAreaDragEnd = useCallback(
+    (area: RoomAreaId, bounds: RectBounds) => {
+      commitRoomAreaBounds(area, bounds);
+    },
+    [commitRoomAreaBounds],
+  );
+
+  const handleRoomAreaResizeStart = useCallback((area: RoomAreaId, handle: RoomAreaResizeHandle) => {
+    const state = usePlannerStore.getState();
+    roomAreaResizeSessionRef.current = {
+      area,
+      handle,
+      startBounds: roomAreaBounds(state.project.canvas.room, area),
+    };
+  }, []);
+
+  const handleRoomAreaResizeMove = useCallback(
+    (point: Point) => {
+      const session = roomAreaResizeSessionRef.current;
+      if (!session) {
+        return;
+      }
+
+      const state = usePlannerStore.getState();
+      const nextBounds = resizeBounds(session.startBounds, session.handle, point, state.project.canvas.gridSize);
+      setDraftRoomArea({ area: session.area, bounds: clampRoomAreaBounds(session.area, nextBounds) });
+    },
+    [clampRoomAreaBounds],
+  );
+
+  const handleRoomAreaResizeEnd = useCallback(() => {
+    const session = roomAreaResizeSessionRef.current;
+    const draft = draftRoomArea;
+    if (!session || !draft) {
+      roomAreaResizeSessionRef.current = null;
+      setDraftRoomArea(null);
+      return;
+    }
+
+    commitRoomAreaBounds(session.area, draft.bounds);
+  }, [commitRoomAreaBounds, draftRoomArea]);
+
   const handleWheel = useCallback(
     (event: KonvaEventObject<WheelEvent>) => {
       event.evt.preventDefault();
@@ -363,6 +490,12 @@ export function PlannerCanvas({ stageRef }: PlannerCanvasProps) {
       const roomArea = activeTool === "select" ? roomAreaFromTarget(event.target) : null;
       pendingRoomAreaSelectionRef.current = roomArea ? { area: roomArea, start: world } : null;
 
+      if (isRoomAreaHandle(event.target) || (roomArea !== null && selectedRoomArea === roomArea)) {
+        selectionStartRef.current = null;
+        setSelectionRect(null);
+        return;
+      }
+
       if (shouldPan) {
         pendingRoomAreaSelectionRef.current = null;
         panSessionRef.current = { pointer, view };
@@ -383,7 +516,7 @@ export function PlannerCanvas({ stageRef }: PlannerCanvasProps) {
       selectionStartRef.current = world;
       setSelectionRect({ x: world.x, y: world.y, width: 0, height: 0 });
     },
-    [activeTool, clearSelection, stageRef, view],
+    [activeTool, clearSelection, selectedRoomArea, stageRef, view],
   );
 
   const handleMouseMove = useCallback(() => {
@@ -464,6 +597,11 @@ export function PlannerCanvas({ stageRef }: PlannerCanvasProps) {
       pendingRoomAreaSelectionRef.current = roomArea ? { area: roomArea, start: world } : null;
       touchMovedRef.current = false;
 
+      if (isRoomAreaHandle(event.target) || (roomArea !== null && selectedRoomArea === roomArea)) {
+        pendingRoomAreaSelectionRef.current = null;
+        return;
+      }
+
       if (!isStageBackground(event.target)) {
         pendingRoomAreaSelectionRef.current = null;
         return;
@@ -477,7 +615,7 @@ export function PlannerCanvas({ stageRef }: PlannerCanvasProps) {
       panSessionRef.current = { pointer, view };
       stage.container().style.cursor = "grabbing";
     },
-    [activeTool, stageRef, view],
+    [activeTool, selectedRoomArea, stageRef, view],
   );
 
   const handleTouchMove = useCallback(
@@ -601,7 +739,20 @@ export function PlannerCanvas({ stageRef }: PlannerCanvasProps) {
         onTouchStart={handleTouchStart}
         onWheel={handleWheel}
       >
-        <GridLayer canvas={project.canvas} height={size.height} selectedRoomArea={selectedRoomArea} view={view} width={size.width} />
+        <GridLayer
+          canvas={project.canvas}
+          draftRoomArea={draftRoomArea}
+          height={size.height}
+          selectedRoomArea={selectedRoomArea}
+          view={view}
+          width={size.width}
+          onRoomAreaDragEnd={handleRoomAreaDragEnd}
+          onRoomAreaDragMove={handleRoomAreaDragMove}
+          onRoomAreaResizeEnd={handleRoomAreaResizeEnd}
+          onRoomAreaResizeMove={handleRoomAreaResizeMove}
+          onRoomAreaResizeStart={handleRoomAreaResizeStart}
+          onSelectRoomArea={selectRoomArea}
+        />
         <Layer listening={false}>
           <Group scaleX={view.scale} scaleY={view.scale} x={view.x} y={view.y}>
             {coneObjects.map((object) => {

@@ -7,16 +7,18 @@ import {
   Lock,
   Unlock,
 } from "lucide-react";
-import type { CanvasSettings, PlanObject, PlanObjectPatch, RoomAreaId } from "../../types/project";
+import type { CanvasSettings, PlanObject, PlanObjectPatch, RectBounds, RoomAreaId } from "../../types/project";
 import { usePlannerStore } from "../../store/plannerStore";
 import { Field, PanelSection, buttonClassName, inputClassName } from "../layout/Panel";
 import {
   displayUnitsPerGridSquare,
   displayUnitsToPixels,
+  createDefaultPerformanceArea,
   normalisedRoomDisplaySize,
   pixelsPerMetreForGridSquare,
   pixelsToDisplayUnits,
   roomAreaBounds,
+  roomWithAreaBounds,
   unitLabel,
 } from "../../utils/scale";
 
@@ -125,6 +127,13 @@ function DocumentProperties({ canvas }: { canvas: CanvasSettings }) {
       [axis]: displayUnitsToPixels(value, canvas),
     });
   };
+  const markPerformanceArea = (): void => {
+    updateRoom({
+      areaMode: "vertical",
+      performanceArea: createDefaultPerformanceArea(canvas.room),
+    });
+    selectRoomArea("performance");
+  };
   const areaButtonClassName = (area: RoomAreaId): string =>
     `${buttonClassName} ${selectedRoomArea === area ? "border-signal-blue bg-blue-50 text-signal-blue" : ""}`;
 
@@ -199,37 +208,22 @@ function DocumentProperties({ canvas }: { canvas: CanvasSettings }) {
           <Field label="Grid Count">
             <input className={inputClassName} readOnly value={`${formatInputNumber(roomGridWidth)} x ${formatInputNumber(roomGridHeight)} squares`} />
           </Field>
-          <Field label="Areas">
-            <select
-              className={inputClassName}
-              value={canvas.room.areaMode}
-              onChange={(event) => {
-                const value = event.target.value;
-                updateRoom({ areaMode: value === "horizontal" ? "horizontal" : value === "vertical" ? "vertical" : "none" });
-              }}
-            >
-              <option value="none">No Split</option>
-              <option value="vertical">Performance | Crew</option>
-              <option value="horizontal">Performance / Crew</option>
-            </select>
-          </Field>
-          <Field label="Split">
-            <input
-              className="h-7 w-full accent-signal-blue"
-              max={0.85}
-              min={0.15}
-              step={0.01}
-              type="range"
-              value={canvas.room.splitRatio}
-              onChange={(event) => updateRoom({ splitRatio: toNumber(event.target.value, canvas.room.splitRatio) })}
-            />
-          </Field>
           <div className="grid grid-cols-2 gap-2">
-            <button className={areaButtonClassName("performance")} type="button" onClick={() => selectRoomArea("performance")}>
-              Performance
-            </button>
             <button className={areaButtonClassName("crew")} type="button" onClick={() => selectRoomArea("crew")}>
               Crew
+            </button>
+            <button
+              className={areaButtonClassName("performance")}
+              type="button"
+              onClick={() => {
+                if (canvas.room.performanceArea) {
+                  selectRoomArea("performance");
+                } else {
+                  markPerformanceArea();
+                }
+              }}
+            >
+              {canvas.room.performanceArea ? "Performance" : "Mark Performance"}
             </button>
           </div>
           <Field label="Performance">
@@ -249,14 +243,12 @@ function DocumentProperties({ canvas }: { canvas: CanvasSettings }) {
 function RoomAreaProperties({ canvas, area }: { canvas: CanvasSettings; area: RoomAreaId }) {
   const setCanvas = usePlannerStore((state) => state.setCanvas);
   const room = canvas.room;
-  const bounds = roomAreaBounds(room, area);
   const currentUnitLabel = unitLabel(canvas.unit);
   const isPerformance = area === "performance";
+  const hasPerformanceArea = room.performanceArea !== null;
+  const bounds = isPerformance && !hasPerformanceArea ? null : roomAreaBounds(room, area);
   const areaLabel = isPerformance ? room.performanceLabel : room.crewLabel;
   const areaColor = isPerformance ? room.performanceColor : room.crewColor;
-  const splitAxis = room.areaMode === "horizontal" ? "height" : "width";
-  const editableSize = splitAxis === "width" ? bounds.width : bounds.height;
-  const editableSizeUnits = normalisedRoomDisplaySize(pixelsToDisplayUnits(editableSize, canvas));
   const updateRoom = (patch: Partial<CanvasSettings["room"]>): void => {
     setCanvas({
       room: {
@@ -265,13 +257,15 @@ function RoomAreaProperties({ canvas, area }: { canvas: CanvasSettings; area: Ro
       },
     });
   };
-  const updateAreaSize = (value: number): void => {
-    const pixels = displayUnitsToPixels(value, canvas);
-    const total = splitAxis === "width" ? room.width : room.height;
-    const rawRatio = isPerformance ? pixels / total : 1 - pixels / total;
+  const markPerformanceArea = (): void => {
     updateRoom({
-      areaMode: room.areaMode === "none" ? "vertical" : room.areaMode,
-      splitRatio: Math.min(Math.max(rawRatio, 0.05), 0.95),
+      areaMode: "vertical",
+      performanceArea: createDefaultPerformanceArea(room),
+    });
+  };
+  const updateAreaBounds = (nextBounds: RectBounds): void => {
+    setCanvas({
+      room: roomWithAreaBounds(room, area, nextBounds, canvas.gridSize),
     });
   };
   const updateAreaLabel = (value: string): void => {
@@ -280,38 +274,79 @@ function RoomAreaProperties({ canvas, area }: { canvas: CanvasSettings; area: Ro
   const updateAreaColor = (value: string): void => {
     updateRoom(isPerformance ? { performanceColor: value } : { crewColor: value });
   };
+  const updateGridPosition = (axis: "x" | "y", value: number): void => {
+    if (!bounds) {
+      return;
+    }
+
+    const absoluteValue = isPerformance ? room[axis] + value * canvas.gridSize : value * canvas.gridSize;
+    updateAreaBounds({
+      ...bounds,
+      [axis]: absoluteValue,
+    });
+  };
+  const updateDisplaySize = (axis: "width" | "height", value: number): void => {
+    if (!bounds) {
+      return;
+    }
+
+    updateAreaBounds({
+      ...bounds,
+      [axis]: displayUnitsToPixels(value, canvas),
+    });
+  };
+  const clearPerformanceArea = (): void => {
+    updateRoom({ areaMode: "none", performanceArea: null });
+  };
+  const gridX = bounds ? (isPerformance ? (bounds.x - room.x) / canvas.gridSize : bounds.x / canvas.gridSize) : 0;
+  const gridY = bounds ? (isPerformance ? (bounds.y - room.y) / canvas.gridSize : bounds.y / canvas.gridSize) : 0;
+  const widthUnits = bounds ? normalisedRoomDisplaySize(pixelsToDisplayUnits(bounds.width, canvas)) : 0;
+  const heightUnits = bounds ? normalisedRoomDisplaySize(pixelsToDisplayUnits(bounds.height, canvas)) : 0;
 
   return (
     <PanelSection title={isPerformance ? "Performance Area" : "Crew Area"}>
       <div className="grid gap-2">
+        {isPerformance && !hasPerformanceArea ? (
+          <button className={buttonClassName} type="button" onClick={markPerformanceArea}>
+            Mark Performance
+          </button>
+        ) : null}
         <Field label="Label">
           <input className={inputClassName} value={areaLabel} onChange={(event) => updateAreaLabel(event.target.value)} />
         </Field>
         <ColorField label="Colour" value={areaColor} onChange={updateAreaColor} />
-        <Field label="Orientation">
-          <select
-            className={inputClassName}
-            value={room.areaMode}
-            onChange={(event) => {
-              const value = event.target.value;
-              updateRoom({ areaMode: value === "horizontal" ? "horizontal" : value === "vertical" ? "vertical" : "none" });
-            }}
-          >
-            <option value="none">No Split</option>
-            <option value="vertical">Performance | Crew</option>
-            <option value="horizontal">Performance / Crew</option>
-          </select>
-        </Field>
-        <Field label={splitAxis === "width" ? `Area W (${currentUnitLabel})` : `Area H (${currentUnitLabel})`}>
-          <NumberInput min={0.1} step={0.1} value={editableSizeUnits} onChange={updateAreaSize} />
-        </Field>
-        <Field label="Grid Count">
-          <input
-            className={inputClassName}
-            readOnly
-            value={`${formatInputNumber(bounds.width / canvas.gridSize)} x ${formatInputNumber(bounds.height / canvas.gridSize)} squares`}
-          />
-        </Field>
+        {bounds ? (
+          <>
+            <div className="grid grid-cols-2 gap-2">
+              <Field label={isPerformance ? "Area X Sq" : "Room X Sq"}>
+                <NumberInput step={1} value={gridX} onChange={(value) => updateGridPosition("x", value)} />
+              </Field>
+              <Field label={isPerformance ? "Area Y Sq" : "Room Y Sq"}>
+                <NumberInput step={1} value={gridY} onChange={(value) => updateGridPosition("y", value)} />
+              </Field>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <Field label={`Area W (${currentUnitLabel})`}>
+                <NumberInput min={0.1} step={0.1} value={widthUnits} onChange={(value) => updateDisplaySize("width", value)} />
+              </Field>
+              <Field label={`Area H (${currentUnitLabel})`}>
+                <NumberInput min={0.1} step={0.1} value={heightUnits} onChange={(value) => updateDisplaySize("height", value)} />
+              </Field>
+            </div>
+            <Field label="Grid Count">
+              <input
+                className={inputClassName}
+                readOnly
+                value={`${formatInputNumber(bounds.width / canvas.gridSize)} x ${formatInputNumber(bounds.height / canvas.gridSize)} squares`}
+              />
+            </Field>
+          </>
+        ) : null}
+        {isPerformance && hasPerformanceArea ? (
+          <button className={buttonClassName} type="button" onClick={clearPerformanceArea}>
+            Clear Performance
+          </button>
+        ) : null}
       </div>
     </PanelSection>
   );
