@@ -20,7 +20,7 @@ interface ObjectNodeProps {
 }
 
 function objectSvg(object: PlanObject): string {
-  return object.assetSvg ?? findAsset(object.assetId)?.svg ?? "";
+  return findAsset(object.assetId)?.svg ?? object.assetSvg ?? "";
 }
 
 function AssetImage({ object }: { object: PlanObject }) {

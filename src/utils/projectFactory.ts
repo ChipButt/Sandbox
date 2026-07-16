@@ -28,6 +28,20 @@ export const defaultCanvasSettings: CanvasSettings = {
   snapToObjects: true,
   snapToCenters: true,
   smartGuides: true,
+  room: {
+    visible: true,
+    x: 560,
+    y: 360,
+    width: 2080,
+    height: 1080,
+    areaMode: "vertical",
+    splitRatio: 0.62,
+    performanceLabel: "Performance Area",
+    crewLabel: "Crew Area",
+    performanceColor: "#e0f2fe",
+    crewColor: "#ecfdf5",
+    labelColor: "#334155",
+  },
 };
 
 export function createDefaultLayers(): LayerDefinition[] {

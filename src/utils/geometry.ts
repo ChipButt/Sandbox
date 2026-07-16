@@ -39,16 +39,38 @@ export function screenToWorld(point: Point, view: ViewState): Point {
   };
 }
 
-export function fitCanvasView(canvas: Size, viewport: Size, margin = 48): ViewState {
-  const availableWidth = Math.max(120, viewport.width - margin * 2);
-  const availableHeight = Math.max(120, viewport.height - margin * 2);
-  const scale = clamp(Math.min(availableWidth / canvas.width, availableHeight / canvas.height), 0.08, 0.65);
+export function workspaceBounds(canvas: CanvasSettings): RectBounds {
+  if (canvas.room.visible) {
+    return {
+      x: canvas.room.x,
+      y: canvas.room.y,
+      width: canvas.room.width,
+      height: canvas.room.height,
+    };
+  }
 
   return {
-    x: (viewport.width - canvas.width * scale) / 2,
-    y: (viewport.height - canvas.height * scale) / 2,
+    x: 0,
+    y: 0,
+    width: canvas.width,
+    height: canvas.height,
+  };
+}
+
+export function fitRectView(rect: RectBounds, viewport: Size, margin = 48): ViewState {
+  const availableWidth = Math.max(120, viewport.width - margin * 2);
+  const availableHeight = Math.max(120, viewport.height - margin * 2);
+  const scale = clamp(Math.min(availableWidth / rect.width, availableHeight / rect.height), 0.08, 0.9);
+
+  return {
+    x: (viewport.width - rect.width * scale) / 2 - rect.x * scale,
+    y: (viewport.height - rect.height * scale) / 2 - rect.y * scale,
     scale,
   };
+}
+
+export function fitCanvasView(canvas: CanvasSettings, viewport: Size, margin = 48): ViewState {
+  return fitRectView(workspaceBounds(canvas), viewport, margin);
 }
 
 export function worldToScreen(point: Point, view: ViewState): Point {

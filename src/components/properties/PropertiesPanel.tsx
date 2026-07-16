@@ -74,44 +74,121 @@ function DocumentProperties({ canvas }: { canvas: CanvasSettings }) {
   const project = usePlannerStore((state) => state.project);
   const setProjectName = usePlannerStore((state) => state.setProjectName);
   const setCanvas = usePlannerStore((state) => state.setCanvas);
+  const updateRoom = (room: Partial<CanvasSettings["room"]>): void => {
+    setCanvas({
+      room: {
+        ...canvas.room,
+        ...room,
+      },
+    });
+  };
+  const centreRoom = (): void => {
+    updateRoom({
+      x: (canvas.width - canvas.room.width) / 2,
+      y: (canvas.height - canvas.room.height) / 2,
+    });
+  };
 
   return (
-    <PanelSection title="Document Properties">
-      <div className="grid gap-2">
-        <Field label="Name">
-          <input className={inputClassName} value={project.metadata.name} onChange={(event) => setProjectName(event.target.value)} />
-        </Field>
-        <Field label="Canvas W">
-          <NumberInput min={400} value={canvas.width} onChange={(value) => setCanvas({ width: value })} />
-        </Field>
-        <Field label="Canvas H">
-          <NumberInput min={400} value={canvas.height} onChange={(value) => setCanvas({ height: value })} />
-        </Field>
-        <Field label="Grid Size">
-          <NumberInput min={4} value={canvas.gridSize} onChange={(value) => setCanvas({ gridSize: value })} />
-        </Field>
-        <ColorField label="Background" value={canvas.background} onChange={(value) => setCanvas({ background: value })} />
-        <Field label="Units">
-          <select className={inputClassName} value={canvas.unit} onChange={(event) => setCanvas({ unit: event.target.value === "imperial" ? "imperial" : "metric" })}>
-            <option value="metric">Metric</option>
-            <option value="imperial">Imperial</option>
-          </select>
-        </Field>
-        <Field label="Pixels / unit">
-          <NumberInput min={1} value={canvas.pixelsPerUnit} onChange={(value) => setCanvas({ pixelsPerUnit: value })} />
-        </Field>
-        <Field label="Scale">
-          <input className={inputClassName} value={canvas.scaleLabel} onChange={(event) => setCanvas({ scaleLabel: event.target.value })} />
-        </Field>
-        <div className="grid grid-cols-2 gap-2 pt-1">
-          <CheckboxField label="Grid" checked={canvas.gridVisible} onChange={(checked) => setCanvas({ gridVisible: checked })} />
-          <CheckboxField label="Snap" checked={canvas.snapEnabled} onChange={(checked) => setCanvas({ snapEnabled: checked })} />
-          <CheckboxField label="Objects" checked={canvas.snapToObjects} onChange={(checked) => setCanvas({ snapToObjects: checked })} />
-          <CheckboxField label="Centres" checked={canvas.snapToCenters} onChange={(checked) => setCanvas({ snapToCenters: checked })} />
-          <CheckboxField label="Guides" checked={canvas.smartGuides} onChange={(checked) => setCanvas({ smartGuides: checked })} />
+    <>
+      <PanelSection title="Document Properties">
+        <div className="grid gap-2">
+          <Field label="Name">
+            <input className={inputClassName} value={project.metadata.name} onChange={(event) => setProjectName(event.target.value)} />
+          </Field>
+          <Field label="Canvas W">
+            <NumberInput min={400} value={canvas.width} onChange={(value) => setCanvas({ width: value })} />
+          </Field>
+          <Field label="Canvas H">
+            <NumberInput min={400} value={canvas.height} onChange={(value) => setCanvas({ height: value })} />
+          </Field>
+          <Field label="Grid Size">
+            <NumberInput min={4} value={canvas.gridSize} onChange={(value) => setCanvas({ gridSize: value })} />
+          </Field>
+          <ColorField label="Room Fill" value={canvas.background} onChange={(value) => setCanvas({ background: value })} />
+          <Field label="Units">
+            <select className={inputClassName} value={canvas.unit} onChange={(event) => setCanvas({ unit: event.target.value === "imperial" ? "imperial" : "metric" })}>
+              <option value="metric">Metric</option>
+              <option value="imperial">Imperial</option>
+            </select>
+          </Field>
+          <Field label="Pixels / unit">
+            <NumberInput min={1} value={canvas.pixelsPerUnit} onChange={(value) => setCanvas({ pixelsPerUnit: value })} />
+          </Field>
+          <Field label="Scale">
+            <input className={inputClassName} value={canvas.scaleLabel} onChange={(event) => setCanvas({ scaleLabel: event.target.value })} />
+          </Field>
+          <div className="grid grid-cols-2 gap-2 pt-1">
+            <CheckboxField label="Grid" checked={canvas.gridVisible} onChange={(checked) => setCanvas({ gridVisible: checked })} />
+            <CheckboxField label="Snap" checked={canvas.snapEnabled} onChange={(checked) => setCanvas({ snapEnabled: checked })} />
+            <CheckboxField label="Objects" checked={canvas.snapToObjects} onChange={(checked) => setCanvas({ snapToObjects: checked })} />
+            <CheckboxField label="Centres" checked={canvas.snapToCenters} onChange={(checked) => setCanvas({ snapToCenters: checked })} />
+            <CheckboxField label="Guides" checked={canvas.smartGuides} onChange={(checked) => setCanvas({ smartGuides: checked })} />
+          </div>
         </div>
-      </div>
-    </PanelSection>
+      </PanelSection>
+      <PanelSection
+        action={
+          <button className={buttonClassName} type="button" onClick={centreRoom}>
+            Centre
+          </button>
+        }
+        title="Room Areas"
+      >
+        <div className="grid gap-2">
+          <CheckboxField label="Show Room" checked={canvas.room.visible} onChange={(checked) => updateRoom({ visible: checked })} />
+          <div className="grid grid-cols-2 gap-2">
+            <Field label="Room X">
+              <NumberInput value={canvas.room.x} onChange={(value) => updateRoom({ x: value })} />
+            </Field>
+            <Field label="Room Y">
+              <NumberInput value={canvas.room.y} onChange={(value) => updateRoom({ y: value })} />
+            </Field>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <Field label="Room W">
+              <NumberInput min={100} value={canvas.room.width} onChange={(value) => updateRoom({ width: value })} />
+            </Field>
+            <Field label="Room H">
+              <NumberInput min={100} value={canvas.room.height} onChange={(value) => updateRoom({ height: value })} />
+            </Field>
+          </div>
+          <Field label="Areas">
+            <select
+              className={inputClassName}
+              value={canvas.room.areaMode}
+              onChange={(event) => {
+                const value = event.target.value;
+                updateRoom({ areaMode: value === "horizontal" ? "horizontal" : value === "vertical" ? "vertical" : "none" });
+              }}
+            >
+              <option value="none">No Split</option>
+              <option value="vertical">Performance | Crew</option>
+              <option value="horizontal">Performance / Crew</option>
+            </select>
+          </Field>
+          <Field label="Split">
+            <input
+              className="h-7 w-full accent-signal-blue"
+              max={0.85}
+              min={0.15}
+              step={0.01}
+              type="range"
+              value={canvas.room.splitRatio}
+              onChange={(event) => updateRoom({ splitRatio: toNumber(event.target.value, canvas.room.splitRatio) })}
+            />
+          </Field>
+          <Field label="Performance">
+            <input className={inputClassName} value={canvas.room.performanceLabel} onChange={(event) => updateRoom({ performanceLabel: event.target.value })} />
+          </Field>
+          <Field label="Crew">
+            <input className={inputClassName} value={canvas.room.crewLabel} onChange={(event) => updateRoom({ crewLabel: event.target.value })} />
+          </Field>
+          <ColorField label="Perf Color" value={canvas.room.performanceColor} onChange={(value) => updateRoom({ performanceColor: value })} />
+          <ColorField label="Crew Color" value={canvas.room.crewColor} onChange={(value) => updateRoom({ crewColor: value })} />
+        </div>
+      </PanelSection>
+    </>
   );
 }
 

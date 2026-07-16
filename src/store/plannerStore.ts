@@ -100,6 +100,10 @@ function normaliseProject(project: PlanufProject): PlanufProject {
     canvas: {
       ...defaultCanvasSettings,
       ...project.canvas,
+      room: {
+        ...defaultCanvasSettings.room,
+        ...project.canvas.room,
+      },
     },
     layers,
     objects: project.objects.map((object) => ({

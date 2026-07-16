@@ -53,6 +53,19 @@ export interface AssetDefinition {
   defaultColor: string;
 }
 
+export type RoomAreaMode = "none" | "vertical" | "horizontal";
+
+export interface RoomSettings extends RectBounds {
+  visible: boolean;
+  areaMode: RoomAreaMode;
+  splitRatio: number;
+  performanceLabel: string;
+  crewLabel: string;
+  performanceColor: string;
+  crewColor: string;
+  labelColor: string;
+}
+
 export interface CanvasSettings extends Size {
   background: string;
   gridSize: number;
@@ -64,6 +77,7 @@ export interface CanvasSettings extends Size {
   snapToObjects: boolean;
   snapToCenters: boolean;
   smartGuides: boolean;
+  room: RoomSettings;
 }
 
 export interface LayerDefinition {

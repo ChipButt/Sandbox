@@ -1,4 +1,3 @@
 <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M19 14h26M16 20h32M16 44h32M19 50h26"/>
-  <path d="M23 20v24M32 20v24M41 20v24"/>
+  <circle cx="32" cy="32" r="16"/><circle cx="32" cy="32" r="8"/><path d="M32 10v8M32 46v8M10 32h8M46 32h8"/>
 </svg>

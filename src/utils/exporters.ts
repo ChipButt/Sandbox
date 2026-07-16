@@ -50,7 +50,7 @@ function escapeXml(value: string): string {
 
 function assetSvg(object: PlanObject): string {
   const asset: AssetDefinition | undefined = findAsset(object.assetId);
-  return object.assetSvg ?? asset?.svg ?? "";
+  return asset?.svg ?? object.assetSvg ?? "";
 }
 
 function objectToSvg(object: PlanObject, canvas: CanvasSettings): string {
@@ -87,12 +87,44 @@ function objectToSvg(object: PlanObject, canvas: CanvasSettings): string {
   return `<g opacity="${opacity}" transform="${transform}">${image}</g>`;
 }
 
+function roomToSvg(canvas: CanvasSettings): string {
+  const { room } = canvas;
+
+  if (!room.visible) {
+    return `<rect x="0" y="0" width="${canvas.width}" height="${canvas.height}" fill="${canvas.background}"/>`;
+  }
+
+  const splitX = room.x + room.width * room.splitRatio;
+  const splitY = room.y + room.height * room.splitRatio;
+  const labels =
+    room.areaMode === "vertical"
+      ? `<text x="${room.x + (room.width * room.splitRatio) / 2}" y="${room.y + 46}" fill="${room.labelColor}" font-size="26" text-anchor="middle">${escapeXml(room.performanceLabel)}</text>
+  <text x="${splitX + (room.width * (1 - room.splitRatio)) / 2}" y="${room.y + 46}" fill="${room.labelColor}" font-size="26" text-anchor="middle">${escapeXml(room.crewLabel)}</text>`
+      : room.areaMode === "horizontal"
+        ? `<text x="${room.x + room.width / 2}" y="${room.y + 46}" fill="${room.labelColor}" font-size="26" text-anchor="middle">${escapeXml(room.performanceLabel)}</text>
+  <text x="${room.x + room.width / 2}" y="${splitY + 46}" fill="${room.labelColor}" font-size="26" text-anchor="middle">${escapeXml(room.crewLabel)}</text>`
+        : "";
+
+  const zones =
+    room.areaMode === "vertical"
+      ? `<rect x="${room.x}" y="${room.y}" width="${room.width * room.splitRatio}" height="${room.height}" fill="${room.performanceColor}" opacity=".55"/>
+  <rect x="${splitX}" y="${room.y}" width="${room.width * (1 - room.splitRatio)}" height="${room.height}" fill="${room.crewColor}" opacity=".55"/>
+  <line x1="${splitX}" y1="${room.y}" x2="${splitX}" y2="${room.y + room.height}" stroke="#64748b" stroke-width="2" stroke-dasharray="12 8"/>`
+      : room.areaMode === "horizontal"
+        ? `<rect x="${room.x}" y="${room.y}" width="${room.width}" height="${room.height * room.splitRatio}" fill="${room.performanceColor}" opacity=".55"/>
+  <rect x="${room.x}" y="${splitY}" width="${room.width}" height="${room.height * (1 - room.splitRatio)}" fill="${room.crewColor}" opacity=".55"/>
+  <line x1="${room.x}" y1="${splitY}" x2="${room.x + room.width}" y2="${splitY}" stroke="#64748b" stroke-width="2" stroke-dasharray="12 8"/>`
+        : "";
+
+  return `<rect x="${room.x}" y="${room.y}" width="${room.width}" height="${room.height}" fill="${canvas.background}" stroke="#334155" stroke-width="3"/>
+  ${zones}
+  ${labels}
+  <rect x="${room.x}" y="${room.y}" width="${room.width}" height="${room.height}" fill="none" stroke="#334155" stroke-width="3"/>`;
+}
+
 export function projectToSvg(project: PlanufProject): string {
   const { canvas } = project;
-  const background =
-    canvas.background === "transparent"
-      ? ""
-      : `<rect x="0" y="0" width="${canvas.width}" height="${canvas.height}" fill="${canvas.background}"/>`;
+  const background = canvas.background === "transparent" ? "" : roomToSvg(canvas);
   const objects = project.objects.map((object) => objectToSvg(object, canvas)).join("\n");
 
   return `<?xml version="1.0" encoding="UTF-8"?>
