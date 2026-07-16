@@ -102,7 +102,7 @@ export function createObjectFromAsset(
     opacity: 1,
     fill: "transparent",
     stroke: asset.defaultColor,
-    strokeWidth: 7,
+    strokeWidth: 4,
     notes: "",
     locked: false,
     visible: true,
