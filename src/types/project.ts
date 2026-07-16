@@ -27,6 +27,7 @@ export type MeasurementKind = "ruler" | "distance" | "dimension" | "room";
 export type MeasurementUnit = "metric" | "imperial";
 export type ActiveTool = "select" | "pan" | MeasurementKind;
 export type ExportFormat = "png" | "png-transparent" | "png-4k" | "png-8k" | "svg" | "pdf-a4" | "pdf-a3";
+export type RoomAreaId = "performance" | "crew";
 
 export interface Point {
   x: number;

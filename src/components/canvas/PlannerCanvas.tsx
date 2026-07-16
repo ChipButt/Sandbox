@@ -3,7 +3,7 @@ import { Group, Layer, Rect, Stage, Transformer, Wedge } from "react-konva";
 import type Konva from "konva";
 import type { KonvaEventObject } from "konva/lib/Node";
 import type { MutableRefObject } from "react";
-import type { MeasurementKind, PlanObject, Point, RectBounds, ViewState } from "../../types/project";
+import type { MeasurementKind, PlanObject, Point, RectBounds, RoomAreaId, ViewState } from "../../types/project";
 import { ASSET_MAP } from "../../utils/assets";
 import { clamp, computeSnap, fitCanvasView, normalizeRect, objectBounds, rectsIntersect, screenToWorld } from "../../utils/geometry";
 import { useElementSize } from "../../hooks/useElementSize";
@@ -29,8 +29,28 @@ interface DraftMeasurement {
   current: Point;
 }
 
+interface PendingRoomAreaSelection {
+  area: RoomAreaId;
+  start: Point;
+}
+
 function isStageBackground(target: Konva.Node): boolean {
-  return target === target.getStage() || target.name() === "canvas-background";
+  const targetName = target.name();
+  return target === target.getStage() || targetName.includes("canvas-background") || targetName.includes("room-area-");
+}
+
+function roomAreaFromTarget(target: Konva.Node): RoomAreaId | null {
+  const targetName = target.name();
+
+  if (targetName.includes("room-area-performance")) {
+    return "performance";
+  }
+
+  if (targetName.includes("room-area-crew")) {
+    return "crew";
+  }
+
+  return null;
 }
 
 function nodeTopLeft(object: PlanObject, node: Konva.Group): Point {
@@ -86,7 +106,9 @@ export function PlannerCanvas({ stageRef }: PlannerCanvasProps) {
   const nodeMap = useRef<Map<string, Konva.Group>>(new Map());
   const dragSessionRef = useRef<DragSession | null>(null);
   const panSessionRef = useRef<{ pointer: Point; view: ViewState } | null>(null);
+  const touchMovedRef = useRef(false);
   const selectionStartRef = useRef<Point | null>(null);
+  const pendingRoomAreaSelectionRef = useRef<PendingRoomAreaSelection | null>(null);
   const hasAutoFitRef = useRef(false);
   const [selectionRect, setSelectionRect] = useState<RectBounds | null>(null);
   const [draftMeasurement, setDraftMeasurement] = useState<DraftMeasurement | null>(null);
@@ -94,11 +116,13 @@ export function PlannerCanvas({ stageRef }: PlannerCanvasProps) {
 
   const project = usePlannerStore((state) => state.project);
   const selectedIds = usePlannerStore((state) => state.selectedIds);
+  const selectedRoomArea = usePlannerStore((state) => state.selectedRoomArea);
   const activeTool = usePlannerStore((state) => state.activeTool);
   const view = usePlannerStore((state) => state.view);
   const guides = usePlannerStore((state) => state.guides);
   const setView = usePlannerStore((state) => state.setView);
   const selectObject = usePlannerStore((state) => state.selectObject);
+  const selectRoomArea = usePlannerStore((state) => state.selectRoomArea);
   const setSelection = usePlannerStore((state) => state.setSelection);
   const clearSelection = usePlannerStore((state) => state.clearSelection);
   const addObjectFromAsset = usePlannerStore((state) => state.addObjectFromAsset);
@@ -336,7 +360,11 @@ export function PlannerCanvas({ stageRef }: PlannerCanvasProps) {
 
       const world = screenToWorld(pointer, view);
       const shouldPan = event.evt.button === 1 || activeTool === "pan";
+      const roomArea = activeTool === "select" ? roomAreaFromTarget(event.target) : null;
+      pendingRoomAreaSelectionRef.current = roomArea ? { area: roomArea, start: world } : null;
+
       if (shouldPan) {
+        pendingRoomAreaSelectionRef.current = null;
         panSessionRef.current = { pointer, view };
         stage.container().style.cursor = "grabbing";
         return;
@@ -395,16 +423,21 @@ export function PlannerCanvas({ stageRef }: PlannerCanvasProps) {
     }
 
     if (selectionRect) {
+      const pendingRoomAreaSelection = pendingRoomAreaSelectionRef.current;
+      const isBoxSelection = selectionRect.width > 4 || selectionRect.height > 4;
       const selected = project.objects
         .filter((object) => object.visible && objectLayerVisible(object, layerMap))
         .filter((object) => rectsIntersect(selectionRect, objectBounds(object)))
         .map((object) => object.id);
 
-      if (selectionRect.width > 4 || selectionRect.height > 4) {
+      if (isBoxSelection) {
         setSelection(selected);
+      } else if (pendingRoomAreaSelection) {
+        selectRoomArea(pendingRoomAreaSelection.area);
       }
       setSelectionRect(null);
       selectionStartRef.current = null;
+      pendingRoomAreaSelectionRef.current = null;
     }
 
     if (draftMeasurement) {
@@ -415,7 +448,7 @@ export function PlannerCanvas({ stageRef }: PlannerCanvasProps) {
     }
 
     window.requestAnimationFrame(syncTransformer);
-  }, [activeTool, addMeasurement, draftMeasurement, layerMap, project.objects, selectionRect, setSelection, stageRef, syncTransformer]);
+  }, [activeTool, addMeasurement, draftMeasurement, layerMap, project.objects, selectRoomArea, selectionRect, setSelection, stageRef, syncTransformer]);
 
   const handleTouchStart = useCallback(
     (event: KonvaEventObject<TouchEvent>) => {
@@ -427,8 +460,12 @@ export function PlannerCanvas({ stageRef }: PlannerCanvasProps) {
 
       event.evt.preventDefault();
       const world = screenToWorld(pointer, view);
+      const roomArea = activeTool === "select" ? roomAreaFromTarget(event.target) : null;
+      pendingRoomAreaSelectionRef.current = roomArea ? { area: roomArea, start: world } : null;
+      touchMovedRef.current = false;
 
       if (!isStageBackground(event.target)) {
+        pendingRoomAreaSelectionRef.current = null;
         return;
       }
 
@@ -455,6 +492,10 @@ export function PlannerCanvas({ stageRef }: PlannerCanvasProps) {
 
       if (panSessionRef.current) {
         const session = panSessionRef.current;
+        if (Math.hypot(pointer.x - session.pointer.x, pointer.y - session.pointer.y) > 6) {
+          touchMovedRef.current = true;
+          pendingRoomAreaSelectionRef.current = null;
+        }
         setView({
           ...session.view,
           x: session.view.x + pointer.x - session.pointer.x,
@@ -481,6 +522,11 @@ export function PlannerCanvas({ stageRef }: PlannerCanvasProps) {
         panSessionRef.current = null;
       }
 
+      if (pendingRoomAreaSelectionRef.current && !touchMovedRef.current) {
+        selectRoomArea(pendingRoomAreaSelectionRef.current.area);
+        pendingRoomAreaSelectionRef.current = null;
+      }
+
       if (draftMeasurement) {
         if (Math.hypot(draftMeasurement.current.x - draftMeasurement.start.x, draftMeasurement.current.y - draftMeasurement.start.y) > 5) {
           addMeasurement(draftMeasurement.kind, draftMeasurement.start, draftMeasurement.current);
@@ -490,7 +536,7 @@ export function PlannerCanvas({ stageRef }: PlannerCanvasProps) {
 
       window.requestAnimationFrame(syncTransformer);
     },
-    [activeTool, addMeasurement, draftMeasurement, stageRef, syncTransformer],
+    [activeTool, addMeasurement, draftMeasurement, selectRoomArea, stageRef, syncTransformer],
   );
 
   const handleDrop = useCallback(
@@ -555,7 +601,7 @@ export function PlannerCanvas({ stageRef }: PlannerCanvasProps) {
         onTouchStart={handleTouchStart}
         onWheel={handleWheel}
       >
-        <GridLayer canvas={project.canvas} height={size.height} view={view} width={size.width} />
+        <GridLayer canvas={project.canvas} height={size.height} selectedRoomArea={selectedRoomArea} view={view} width={size.width} />
         <Layer listening={false}>
           <Group scaleX={view.scale} scaleY={view.scale} x={view.x} y={view.y}>
             {coneObjects.map((object) => {

@@ -1,4 +1,5 @@
 import type { CanvasSettings, GuideLine, PlanObject, Point, RectBounds, Size, SnapResult, ViewState } from "../types/project";
+import { pixelsToDisplayUnits, unitLabel } from "./scale";
 
 export function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
@@ -85,16 +86,15 @@ export function distance(first: Point, second: Point): number {
 }
 
 export function formatMeasurement(pixels: number, settings: CanvasSettings): string {
-  const units = pixels / settings.pixelsPerUnit;
+  const units = pixelsToDisplayUnits(pixels, settings);
 
   if (settings.unit === "imperial") {
-    const feet = units * 3.28084;
-    const wholeFeet = Math.floor(feet);
-    const inches = Math.round((feet - wholeFeet) * 12);
+    const wholeFeet = Math.floor(units);
+    const inches = Math.round((units - wholeFeet) * 12);
     return inches === 12 ? `${wholeFeet + 1}' 0"` : `${wholeFeet}' ${inches}"`;
   }
 
-  return units >= 10 ? `${units.toFixed(1)} m` : `${units.toFixed(2)} m`;
+  return units >= 10 ? `${units.toFixed(1)} ${unitLabel(settings.unit)}` : `${units.toFixed(2)} ${unitLabel(settings.unit)}`;
 }
 
 function addGuide(guides: GuideLine[], guide: GuideLine): void {
@@ -146,8 +146,9 @@ export function computeSnap(
   };
 
   if (canvas.snapToCenters) {
-    const centreX = canvas.width / 2;
-    const centreY = canvas.height / 2;
+    const workspace = workspaceBounds(canvas);
+    const centreX = workspace.x + workspace.width / 2;
+    const centreY = workspace.y + workspace.height / 2;
     const snappedX = snapScalar(movingCenters.x, centreX, threshold);
     const snappedY = snapScalar(movingCenters.y, centreY, threshold);
 
@@ -157,9 +158,9 @@ export function computeSnap(
         id: "canvas-centre-x",
         orientation: "vertical",
         position: centreX,
-        from: 0,
-        to: canvas.height,
-        label: "Canvas centre",
+        from: workspace.y,
+        to: workspace.y + workspace.height,
+        label: "Room centre",
       });
     }
 
@@ -169,9 +170,9 @@ export function computeSnap(
         id: "canvas-centre-y",
         orientation: "horizontal",
         position: centreY,
-        from: 0,
-        to: canvas.width,
-        label: "Canvas centre",
+        from: workspace.x,
+        to: workspace.x + workspace.width,
+        label: "Room centre",
       });
     }
   }

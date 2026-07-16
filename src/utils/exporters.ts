@@ -21,7 +21,8 @@ export function exportStageToPng(stage: Konva.Stage, options: PngExportOptions):
   const previousFill = stage.container().style.backgroundColor;
   const backgroundNodes = stage.find(".canvas-background");
   const gridNodes = stage.find(".canvas-grid");
-  const hiddenNodes = [...backgroundNodes, ...gridNodes];
+  const roomNodes = [...stage.find(".room-area-fill"), ...stage.find(".room-area-label"), ...stage.find(".room-area-border")];
+  const hiddenNodes = [...backgroundNodes, ...gridNodes, ...roomNodes];
   const previousVisibility = hiddenNodes.map((node) => node.visible());
   if (options.transparent) {
     stage.container().style.backgroundColor = "transparent";

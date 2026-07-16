@@ -9,6 +9,7 @@ import type {
   PlanObjectPatch,
   PlanufProject,
   Point,
+  RoomAreaId,
   ViewState,
 } from "../types/project";
 import { createId } from "../utils/id";
@@ -23,6 +24,7 @@ import {
   DEFAULT_LAYER_ID,
   touchProject,
 } from "../utils/projectFactory";
+import { scaleLabelForCanvas, snapRoomToGrid } from "../utils/scale";
 import { createProjectFromTemplate } from "../utils/templates";
 
 const MAX_HISTORY = 80;
@@ -36,6 +38,7 @@ interface HistoryState {
 interface PlannerStore {
   project: PlanufProject;
   selectedIds: string[];
+  selectedRoomArea: RoomAreaId | null;
   activeLayerId: string;
   activeTool: "select" | "pan" | MeasurementKind;
   view: ViewState;
@@ -61,6 +64,7 @@ interface PlannerStore {
   moveObjectsBy: (ids: string[], delta: Point) => void;
   moveObjectTo: (id: string, point: Point) => void;
   selectObject: (id: string, additive: boolean) => void;
+  selectRoomArea: (area: RoomAreaId) => void;
   setSelection: (ids: string[]) => void;
   clearSelection: () => void;
   deleteSelected: () => void;
@@ -89,22 +93,35 @@ function cloneProject(project: PlanufProject): PlanufProject {
   return structuredClone(project);
 }
 
+function mergeCanvasSettings(current: CanvasSettings, settings: Partial<CanvasSettings>): CanvasSettings {
+  const next: CanvasSettings = {
+    ...current,
+    ...settings,
+    room: snapRoomToGrid(
+      {
+        ...current.room,
+        ...(settings.room ?? {}),
+      },
+      settings.gridSize ?? current.gridSize,
+    ),
+  };
+
+  return {
+    ...next,
+    scaleLabel: settings.scaleLabel ?? scaleLabelForCanvas(next),
+  };
+}
+
 function normaliseProject(project: PlanufProject): PlanufProject {
   const fallback = createBlankProject(project.metadata.name);
   const layers = project.layers.length > 0 ? project.layers : createDefaultLayers();
   const layerIds = new Set(layers.map((layer) => layer.id));
+  const canvas = mergeCanvasSettings(defaultCanvasSettings, project.canvas);
 
   return {
     ...fallback,
     ...project,
-    canvas: {
-      ...defaultCanvasSettings,
-      ...project.canvas,
-      room: {
-        ...defaultCanvasSettings.room,
-        ...project.canvas.room,
-      },
-    },
+    canvas,
     layers,
     objects: project.objects.map((object) => ({
       ...object,
@@ -180,6 +197,7 @@ function moveInArray<T>(items: T[], index: number, delta: number): T[] {
 export const usePlannerStore = create<PlannerStore>((set, get) => ({
   project: createBlankProject(),
   selectedIds: [],
+  selectedRoomArea: null,
   activeLayerId: DEFAULT_LAYER_ID,
   activeTool: "select",
   view: { x: 48, y: 48, scale: 0.32 },
@@ -190,10 +208,11 @@ export const usePlannerStore = create<PlannerStore>((set, get) => ({
   history: { past: [], future: [] },
 
   newProject: (templateId) => {
-    const project = templateId ? createProjectFromTemplate(templateId) : createBlankProject();
+    const project = normaliseProject(templateId ? createProjectFromTemplate(templateId) : createBlankProject());
     set((state) => ({
       project,
       selectedIds: [],
+      selectedRoomArea: null,
       activeLayerId: DEFAULT_LAYER_ID,
       activeTool: "select",
       history: { past: [...state.history.past, cloneProject(state.project)].slice(-MAX_HISTORY), future: [] },
@@ -206,6 +225,7 @@ export const usePlannerStore = create<PlannerStore>((set, get) => ({
     set({
       project: normalised,
       selectedIds: [],
+      selectedRoomArea: null,
       activeLayerId: normalised.layers[0]?.id ?? DEFAULT_LAYER_ID,
       activeTool: "select",
       history: { past: [], future: [] },
@@ -226,10 +246,7 @@ export const usePlannerStore = create<PlannerStore>((set, get) => ({
     set((state) =>
       withHistory(state, {
         ...state.project,
-        canvas: {
-          ...state.project.canvas,
-          ...settings,
-        },
+        canvas: mergeCanvasSettings(state.project.canvas, settings),
       }),
     );
   },
@@ -253,7 +270,7 @@ export const usePlannerStore = create<PlannerStore>((set, get) => ({
         `Added ${asset.name}`,
       ),
     );
-    set({ selectedIds: [object.id] });
+    set({ selectedIds: [object.id], selectedRoomArea: null });
     return object.id;
   },
 
@@ -265,13 +282,13 @@ export const usePlannerStore = create<PlannerStore>((set, get) => ({
     }
     const object = clonePresetObject(preset, point);
     set((current) => withHistory(current, replaceObjects(current.project, [...current.project.objects, object]), `Added ${preset.name}`));
-    set({ selectedIds: [object.id] });
+    set({ selectedIds: [object.id], selectedRoomArea: null });
   },
 
   addMeasurement: (kind, start, end) => {
     const object = createMeasurementObject(kind, start, end);
     set((state) => withHistory(state, replaceObjects(state.project, [...state.project.objects, object]), "Added measurement"));
-    set({ selectedIds: [object.id] });
+    set({ selectedIds: [object.id], selectedRoomArea: null });
   },
 
   updateObject: (id, patch) => {
@@ -327,15 +344,26 @@ export const usePlannerStore = create<PlannerStore>((set, get) => ({
 
       if (additive) {
         const exists = state.selectedIds.includes(id);
-        return { selectedIds: exists ? state.selectedIds.filter((selectedId) => selectedId !== id) : [...state.selectedIds, id] };
+        return {
+          selectedIds: exists ? state.selectedIds.filter((selectedId) => selectedId !== id) : [...state.selectedIds, id],
+          selectedRoomArea: null,
+        };
       }
 
-      return { selectedIds: [id] };
+      return { selectedIds: [id], selectedRoomArea: null };
     });
   },
 
-  setSelection: (ids) => set({ selectedIds: ids }),
-  clearSelection: () => set({ selectedIds: [] }),
+  selectRoomArea: (area) => {
+    set({
+      selectedIds: [],
+      selectedRoomArea: area,
+      status: area === "performance" ? "Selected Performance Area" : "Selected Crew Area",
+    });
+  },
+
+  setSelection: (ids) => set({ selectedIds: ids, selectedRoomArea: null }),
+  clearSelection: () => set({ selectedIds: [], selectedRoomArea: null }),
 
   deleteSelected: () => {
     set((state) => {
@@ -347,6 +375,7 @@ export const usePlannerStore = create<PlannerStore>((set, get) => ({
       return {
         ...withHistory(state, replaceObjects(state.project, objects), "Deleted selection"),
         selectedIds: [],
+        selectedRoomArea: null,
       };
     });
   },
@@ -372,6 +401,7 @@ export const usePlannerStore = create<PlannerStore>((set, get) => ({
     set((current) => ({
       ...withHistory(current, replaceObjects(current.project, [...current.project.objects, ...pasted]), `Pasted ${pasted.length} object${pasted.length === 1 ? "" : "s"}`),
       selectedIds: pasted.map((object) => object.id),
+      selectedRoomArea: null,
     }));
   },
 
@@ -387,6 +417,7 @@ export const usePlannerStore = create<PlannerStore>((set, get) => ({
     set((current) => ({
       ...withHistory(current, replaceObjects(current.project, [...current.project.objects, ...duplicated]), "Duplicated selection"),
       selectedIds: duplicated.map((object) => object.id),
+      selectedRoomArea: null,
     }));
   },
 
@@ -545,6 +576,7 @@ export const usePlannerStore = create<PlannerStore>((set, get) => ({
           future: [cloneProject(state.project), ...state.history.future].slice(0, MAX_HISTORY),
         },
         selectedIds: state.selectedIds.filter((id) => previous.objects.some((object) => object.id === id)),
+        selectedRoomArea: null,
         status: "Undo",
       };
     });
@@ -563,6 +595,7 @@ export const usePlannerStore = create<PlannerStore>((set, get) => ({
           future: state.history.future.slice(1),
         },
         selectedIds: state.selectedIds.filter((id) => next.objects.some((object) => object.id === id)),
+        selectedRoomArea: null,
         status: "Redo",
       };
     });

@@ -70,7 +70,7 @@ export const TEMPLATE_DEFINITIONS: TemplateDefinition[] = [
     id: "podcast",
     name: "Podcast",
     description: "Roundtable show setup with microphones, cameras, and monitors.",
-    canvas: { scaleLabel: "1 square = 0.25 m" },
+    canvas: { pixelsPerUnit: 80, scaleLabel: "1 square = 0.25 m" },
     objects: [
       objectSpec("furniture/table-round", 1000, 780, { width: 260, height: 260, name: "Podcast table" }),
       objectSpec("people/host", 1000, 560, { name: "Host" }),
@@ -124,7 +124,7 @@ export const TEMPLATE_DEFINITIONS: TemplateDefinition[] = [
     id: "warehouse",
     name: "Warehouse",
     description: "Large open practical space with walls, columns, people and grip positions.",
-    canvas: { width: 4200, height: 2400, gridSize: 40, scaleLabel: "1 square = 1 m" },
+    canvas: { width: 4200, height: 2400, gridSize: 40, pixelsPerUnit: 40, scaleLabel: "1 square = 1 m" },
     objects: [
       objectSpec("architecture/column", 870, 690, { name: "Column A" }),
       objectSpec("architecture/column", 1430, 690, { name: "Column B" }),
