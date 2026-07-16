@@ -5,7 +5,7 @@ import type { KonvaEventObject } from "konva/lib/Node";
 import type { MutableRefObject } from "react";
 import type { MeasurementKind, PlanObject, Point, RectBounds, ViewState } from "../../types/project";
 import { ASSET_MAP } from "../../utils/assets";
-import { clamp, computeSnap, normalizeRect, objectBounds, rectsIntersect, screenToWorld } from "../../utils/geometry";
+import { clamp, computeSnap, fitCanvasView, normalizeRect, objectBounds, rectsIntersect, screenToWorld } from "../../utils/geometry";
 import { useElementSize } from "../../hooks/useElementSize";
 import { usePlannerStore } from "../../store/plannerStore";
 import { GridLayer } from "./GridLayer";
@@ -87,6 +87,7 @@ export function PlannerCanvas({ stageRef }: PlannerCanvasProps) {
   const dragSessionRef = useRef<DragSession | null>(null);
   const panSessionRef = useRef<{ pointer: Point; view: ViewState } | null>(null);
   const selectionStartRef = useRef<Point | null>(null);
+  const hasAutoFitRef = useRef(false);
   const [selectionRect, setSelectionRect] = useState<RectBounds | null>(null);
   const [draftMeasurement, setDraftMeasurement] = useState<DraftMeasurement | null>(null);
   const size = useElementSize(containerRef);
@@ -164,6 +165,15 @@ export function PlannerCanvas({ stageRef }: PlannerCanvasProps) {
   useEffect(() => {
     syncTransformer();
   }, [syncTransformer]);
+
+  useEffect(() => {
+    if (hasAutoFitRef.current || size.width <= 0 || size.height <= 0) {
+      return;
+    }
+
+    hasAutoFitRef.current = true;
+    setView(fitCanvasView(project.canvas, size));
+  }, [project.canvas, setView, size]);
 
   const handleObjectSelect = useCallback(
     (id: string, additive: boolean) => {
@@ -407,6 +417,82 @@ export function PlannerCanvas({ stageRef }: PlannerCanvasProps) {
     window.requestAnimationFrame(syncTransformer);
   }, [activeTool, addMeasurement, draftMeasurement, layerMap, project.objects, selectionRect, setSelection, stageRef, syncTransformer]);
 
+  const handleTouchStart = useCallback(
+    (event: KonvaEventObject<TouchEvent>) => {
+      const stage = stageRef.current;
+      const pointer = stage?.getPointerPosition();
+      if (!stage || !pointer) {
+        return;
+      }
+
+      event.evt.preventDefault();
+      const world = screenToWorld(pointer, view);
+
+      if (!isStageBackground(event.target)) {
+        return;
+      }
+
+      if (activeTool === "ruler" || activeTool === "distance" || activeTool === "dimension" || activeTool === "room") {
+        setDraftMeasurement({ kind: activeTool, start: world, current: world });
+        return;
+      }
+
+      panSessionRef.current = { pointer, view };
+      stage.container().style.cursor = "grabbing";
+    },
+    [activeTool, stageRef, view],
+  );
+
+  const handleTouchMove = useCallback(
+    (event: KonvaEventObject<TouchEvent>) => {
+      const stage = stageRef.current;
+      const pointer = stage?.getPointerPosition();
+      if (!stage || !pointer) {
+        return;
+      }
+
+      event.evt.preventDefault();
+
+      if (panSessionRef.current) {
+        const session = panSessionRef.current;
+        setView({
+          ...session.view,
+          x: session.view.x + pointer.x - session.pointer.x,
+          y: session.view.y + pointer.y - session.pointer.y,
+        });
+        return;
+      }
+
+      const world = screenToWorld(pointer, usePlannerStore.getState().view);
+      setDraftMeasurement((current) => (current ? { ...current, current: world } : null));
+    },
+    [setView, stageRef],
+  );
+
+  const handleTouchEnd = useCallback(
+    (event: KonvaEventObject<TouchEvent>) => {
+      event.evt.preventDefault();
+      const stage = stageRef.current;
+      if (stage) {
+        stage.container().style.cursor = activeTool === "pan" ? "grab" : "default";
+      }
+
+      if (panSessionRef.current) {
+        panSessionRef.current = null;
+      }
+
+      if (draftMeasurement) {
+        if (Math.hypot(draftMeasurement.current.x - draftMeasurement.start.x, draftMeasurement.current.y - draftMeasurement.start.y) > 5) {
+          addMeasurement(draftMeasurement.kind, draftMeasurement.start, draftMeasurement.current);
+        }
+        setDraftMeasurement(null);
+      }
+
+      window.requestAnimationFrame(syncTransformer);
+    },
+    [activeTool, addMeasurement, draftMeasurement, stageRef, syncTransformer],
+  );
+
   const handleDrop = useCallback(
     (event: React.DragEvent<HTMLDivElement>) => {
       event.preventDefault();
@@ -452,7 +538,7 @@ export function PlannerCanvas({ stageRef }: PlannerCanvasProps) {
 
   return (
     <div
-      className="h-full w-full bg-[#bfc5ce]"
+      className="h-full w-full touch-none bg-[#bfc5ce]"
       ref={containerRef}
       onDragOver={(event) => event.preventDefault()}
       onDrop={handleDrop}
@@ -464,6 +550,9 @@ export function PlannerCanvas({ stageRef }: PlannerCanvasProps) {
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
+        onTouchEnd={handleTouchEnd}
+        onTouchMove={handleTouchMove}
+        onTouchStart={handleTouchStart}
         onWheel={handleWheel}
       >
         <GridLayer canvas={project.canvas} height={size.height} view={view} width={size.width} />

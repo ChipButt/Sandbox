@@ -178,7 +178,7 @@ export const usePlannerStore = create<PlannerStore>((set, get) => ({
   selectedIds: [],
   activeLayerId: DEFAULT_LAYER_ID,
   activeTool: "select",
-  view: { x: 380, y: 120, scale: 0.55 },
+  view: { x: 48, y: 48, scale: 0.32 },
   clipboard: [],
   guides: [],
   status: "Ready",

@@ -1,4 +1,4 @@
-import type { CanvasSettings, GuideLine, PlanObject, Point, RectBounds, SnapResult, ViewState } from "../types/project";
+import type { CanvasSettings, GuideLine, PlanObject, Point, RectBounds, Size, SnapResult, ViewState } from "../types/project";
 
 export function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
@@ -36,6 +36,18 @@ export function screenToWorld(point: Point, view: ViewState): Point {
   return {
     x: (point.x - view.x) / view.scale,
     y: (point.y - view.y) / view.scale,
+  };
+}
+
+export function fitCanvasView(canvas: Size, viewport: Size, margin = 48): ViewState {
+  const availableWidth = Math.max(120, viewport.width - margin * 2);
+  const availableHeight = Math.max(120, viewport.height - margin * 2);
+  const scale = clamp(Math.min(availableWidth / canvas.width, availableHeight / canvas.height), 0.08, 0.65);
+
+  return {
+    x: (viewport.width - canvas.width * scale) / 2,
+    y: (viewport.height - canvas.height * scale) / 2,
+    scale,
   };
 }
 

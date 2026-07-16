@@ -3,6 +3,7 @@ import { usePlannerStore } from "../../store/plannerStore";
 import { PanelSection, buttonClassName } from "../layout/Panel";
 import { findAsset } from "../../utils/assets";
 import { SvgIconPreview } from "../icons/SvgIconPreview";
+import { clamp, screenToWorld } from "../../utils/geometry";
 
 export function PresetsPanel() {
   const project = usePlannerStore((state) => state.project);
@@ -10,6 +11,15 @@ export function PresetsPanel() {
   const deletePreset = usePlannerStore((state) => state.deletePreset);
   const addObjectFromPreset = usePlannerStore((state) => state.addObjectFromPreset);
   const selectedIds = usePlannerStore((state) => state.selectedIds);
+  const view = usePlannerStore((state) => state.view);
+
+  const addPresetAtViewportCentre = (presetId: string): void => {
+    const world = screenToWorld({ x: window.innerWidth / 2, y: window.innerHeight / 2 }, view);
+    addObjectFromPreset(presetId, {
+      x: clamp(world.x, 0, project.canvas.width),
+      y: clamp(world.y, 0, project.canvas.height),
+    });
+  };
 
   return (
     <PanelSection
@@ -33,7 +43,7 @@ export function PresetsPanel() {
                   className="flex min-w-0 flex-1 items-center gap-2 text-left"
                   draggable
                   type="button"
-                  onClick={() => addObjectFromPreset(preset.id, { x: project.canvas.width / 2, y: project.canvas.height / 2 })}
+                  onClick={() => addPresetAtViewportCentre(preset.id)}
                   onDragStart={(event) => {
                     event.dataTransfer.setData("application/planuf-preset", preset.id);
                     event.dataTransfer.effectAllowed = "copy";

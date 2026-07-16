@@ -6,6 +6,7 @@ import { TEMPLATE_SUMMARIES } from "../../utils/templates";
 import { usePlannerStore } from "../../store/plannerStore";
 import { PanelSection, buttonClassName, inputClassName } from "../layout/Panel";
 import { SvgIconPreview } from "../icons/SvgIconPreview";
+import { clamp, screenToWorld } from "../../utils/geometry";
 
 const MEASUREMENT_TOOLS: Array<{ id: ActiveTool; label: string }> = [
   { id: "ruler", label: "Ruler" },
@@ -22,6 +23,7 @@ export function AssetBrowser() {
   const newProject = usePlannerStore((state) => state.newProject);
   const addObjectFromAsset = usePlannerStore((state) => state.addObjectFromAsset);
   const canvas = usePlannerStore((state) => state.project.canvas);
+  const view = usePlannerStore((state) => state.view);
 
   const filteredAssets = useMemo(() => {
     const normalised = search.trim().toLowerCase();
@@ -35,8 +37,20 @@ export function AssetBrowser() {
     });
   }, [activeCategory, search]);
 
+  const addAtViewportCentre = (assetId: string): void => {
+    const asset = ASSETS.find((item) => item.id === assetId);
+    if (!asset) {
+      return;
+    }
+    const world = screenToWorld({ x: window.innerWidth / 2, y: window.innerHeight / 2 }, view);
+    addObjectFromAsset(asset, {
+      x: clamp(world.x, 0, canvas.width),
+      y: clamp(world.y, 0, canvas.height),
+    });
+  };
+
   return (
-    <div className="flex h-full flex-col">
+    <div className="thin-scrollbar h-full overflow-y-auto">
       <PanelSection title="Asset Browser">
         <div className="relative">
           <Search className="pointer-events-none absolute left-2 top-1.5 h-4 w-4 text-ink-500" />
@@ -61,26 +75,24 @@ export function AssetBrowser() {
         </div>
       </PanelSection>
 
-      <div className="thin-scrollbar min-h-0 flex-1 overflow-y-auto">
-        <div className="grid grid-cols-2 gap-2 p-3">
-          {filteredAssets.map((asset) => (
-            <button
-              className="group flex min-h-[94px] flex-col items-center justify-center gap-2 rounded border border-black/10 bg-white p-2 text-center shadow-sm transition hover:border-signal-blue hover:bg-blue-50"
-              draggable
-              key={asset.id}
-              title={`Drag ${asset.name} to the canvas`}
-              type="button"
-              onDoubleClick={() => addObjectFromAsset(asset, { x: canvas.width / 2, y: canvas.height / 2 })}
-              onDragStart={(event) => {
-                event.dataTransfer.setData("application/planuf-asset", asset.id);
-                event.dataTransfer.effectAllowed = "copy";
-              }}
-            >
-              <SvgIconPreview svg={asset.svg} color={asset.defaultColor} className="h-9 w-9 [&_svg]:h-full [&_svg]:w-full" />
-              <span className="line-clamp-2 text-[11px] leading-tight text-ink-800">{asset.name}</span>
-            </button>
-          ))}
-        </div>
+      <div className="grid grid-cols-2 gap-2 p-3">
+        {filteredAssets.map((asset) => (
+          <button
+            className="group flex min-h-[94px] flex-col items-center justify-center gap-2 rounded border border-black/10 bg-white p-2 text-center shadow-sm transition hover:border-signal-blue hover:bg-blue-50"
+            draggable
+            key={asset.id}
+            title={`Drag or tap ${asset.name} to add it to the canvas`}
+            type="button"
+            onClick={() => addAtViewportCentre(asset.id)}
+            onDragStart={(event) => {
+              event.dataTransfer.setData("application/planuf-asset", asset.id);
+              event.dataTransfer.effectAllowed = "copy";
+            }}
+          >
+            <SvgIconPreview svg={asset.svg} color={asset.defaultColor} className="h-9 w-9 [&_svg]:h-full [&_svg]:w-full" />
+            <span className="line-clamp-2 text-[11px] leading-tight text-ink-800">{asset.name}</span>
+          </button>
+        ))}
       </div>
 
       <PanelSection title="Measurement Tools">

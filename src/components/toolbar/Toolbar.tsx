@@ -19,7 +19,7 @@ import type Konva from "konva";
 import type { MutableRefObject } from "react";
 import type { ReactNode } from "react";
 import { usePlannerStore } from "../../store/plannerStore";
-import { clamp } from "../../utils/geometry";
+import { clamp, fitCanvasView } from "../../utils/geometry";
 import { exportProjectSvg, exportStageToPdf, exportStageToPng } from "../../utils/exporters";
 
 interface ToolbarProps {
@@ -44,15 +44,16 @@ function ToolbarButton({
 }) {
   return (
     <button
-      className={`inline-flex h-8 items-center gap-1.5 rounded border px-2 text-[12px] font-medium shadow-sm transition ${
+      className={`inline-flex h-9 min-w-9 items-center justify-center gap-1.5 rounded border px-0 text-[12px] font-medium shadow-sm transition sm:h-8 sm:min-w-0 sm:px-2 ${
         active ? "border-signal-blue bg-blue-50 text-signal-blue" : "border-black/15 bg-white text-ink-800 hover:bg-ink-100"
       }`}
+      aria-label={label}
       title={title ?? label}
       type="button"
       onClick={onClick}
     >
       {children}
-      <span>{label}</span>
+      <span className="hidden sm:inline">{label}</span>
     </button>
   );
 }
@@ -65,7 +66,6 @@ export function Toolbar({ stageRef, onOpen, onSave, onSaveAs }: ToolbarProps) {
   const project = usePlannerStore((state) => state.project);
   const view = usePlannerStore((state) => state.view);
   const setView = usePlannerStore((state) => state.setView);
-  const resetView = usePlannerStore((state) => state.resetView);
   const setCanvas = usePlannerStore((state) => state.setCanvas);
   const newProject = usePlannerStore((state) => state.newProject);
   const undo = usePlannerStore((state) => state.undo);
@@ -125,7 +125,7 @@ export function Toolbar({ stageRef, onOpen, onSave, onSaveAs }: ToolbarProps) {
   };
 
   return (
-    <div className="flex h-full min-w-0 items-center gap-2 overflow-x-auto px-2">
+    <div className="thin-scrollbar flex h-full min-w-0 items-center gap-2 overflow-x-auto px-2">
       <div className="flex items-center gap-1">
         <ToolbarButton label="New" title="New (Ctrl+N)" onClick={() => newProject("blank-studio")}>
           <FilePlus2 className="h-4 w-4" />
@@ -215,7 +215,15 @@ export function Toolbar({ stageRef, onOpen, onSave, onSaveAs }: ToolbarProps) {
         <ToolbarButton label="Zoom +" onClick={() => zoom(1.18)}>
           <Plus className="h-4 w-4" />
         </ToolbarButton>
-        <ToolbarButton label="Reset View" onClick={resetView}>
+        <ToolbarButton
+          label="Reset View"
+          onClick={() => {
+            const stage = stageRef.current;
+            if (stage) {
+              setView(fitCanvasView(project.canvas, { width: stage.width(), height: stage.height() }));
+            }
+          }}
+        >
           <RotateCcw className="h-4 w-4" />
         </ToolbarButton>
       </div>

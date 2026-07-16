@@ -8,17 +8,17 @@ export function StatusBar() {
   const lastAutosavedAt = usePlannerStore((state) => state.lastAutosavedAt);
 
   return (
-    <div className="flex h-full items-center justify-between gap-4 px-3 text-[12px] text-ink-700">
+    <div className="flex h-full items-center justify-between gap-3 px-3 text-[12px] text-ink-700">
       <div className="flex min-w-0 items-center gap-3">
         <span className="truncate font-medium text-ink-900">{status}</span>
         <span>{selectedIds.length} selected</span>
-        <span>{project.objects.length} objects</span>
+        <span className="hidden sm:inline">{project.objects.length} objects</span>
       </div>
       <div className="flex shrink-0 items-center gap-3">
         <span>{Math.round(view.scale * 100)}%</span>
-        <span>{project.canvas.unit === "metric" ? "Metric" : "Imperial"}</span>
-        <span>{project.canvas.scaleLabel}</span>
-        <span>{lastAutosavedAt ? `Autosaved ${new Date(lastAutosavedAt).toLocaleTimeString()}` : "Autosave ready"}</span>
+        <span className="hidden sm:inline">{project.canvas.unit === "metric" ? "Metric" : "Imperial"}</span>
+        <span className="hidden md:inline">{project.canvas.scaleLabel}</span>
+        <span className="hidden lg:inline">{lastAutosavedAt ? `Autosaved ${new Date(lastAutosavedAt).toLocaleTimeString()}` : "Autosave ready"}</span>
       </div>
     </div>
   );
