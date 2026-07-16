@@ -14,17 +14,19 @@ export const ASSET_CATEGORIES: ReadonlyArray<{ id: AssetCategory; label: string 
   { id: "misc", label: "Misc" },
 ];
 
+const DEFAULT_ICON_COLOR = "#000000";
+
 const DEFAULT_CATEGORY_COLOR: Record<AssetCategory, string> = {
-  cameras: "#2563eb",
-  lighting: "#b45309",
-  furniture: "#47718c",
-  "set-walls": "#222222",
-  architecture: "#3d4145",
-  props: "#15803d",
-  audio: "#7c3aed",
-  grip: "#dc2626",
-  people: "#0891b2",
-  misc: "#6a7078",
+  cameras: DEFAULT_ICON_COLOR,
+  lighting: DEFAULT_ICON_COLOR,
+  furniture: DEFAULT_ICON_COLOR,
+  "set-walls": DEFAULT_ICON_COLOR,
+  architecture: DEFAULT_ICON_COLOR,
+  props: DEFAULT_ICON_COLOR,
+  audio: DEFAULT_ICON_COLOR,
+  grip: DEFAULT_ICON_COLOR,
+  people: DEFAULT_ICON_COLOR,
+  misc: DEFAULT_ICON_COLOR,
 };
 
 const rawSvgModules = import.meta.glob<string>("../assets/icons/**/*.svg", {

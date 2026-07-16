@@ -1,3 +1,7 @@
-<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-  <rect x="17" y="15" width="30" height="24" rx="2"/><path d="M10 47h44l-7-8H17zM28 43h8"/>
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <g fill="#fff" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="29" y="25" width="70" height="49" rx="6"/>
+    <path d="M16 91h96L99 74H29Z"/>
+    <path fill="none" d="M48 84h32M44 39h40M44 53h40"/>
+  </g>
 </svg>
